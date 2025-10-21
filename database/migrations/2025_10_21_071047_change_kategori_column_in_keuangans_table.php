@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('events', function (Blueprint $table) {
-        $table->id();
-        $table->string('title');
-        $table->date('start_date');
-        $table->date('end_date')->nullable();
-        $table->timestamps();
-
-    });
+        Schema::table('keuangans', function (Blueprint $table) {
+            $table->string('kategori')->change(); // Ubah dari enum ke string
+        });
     }
 
     /**
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('events');
+        Schema::table('keuangans', function (Blueprint $table) {
+            //
+        });
     }
 };

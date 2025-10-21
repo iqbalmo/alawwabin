@@ -9,16 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    // database/migrations/..._add_gaji_pokok_to_gurus_table.php
     public function up(): void
     {
-       Schema::create('events', function (Blueprint $table) {
-        $table->id();
-        $table->string('title');
-        $table->date('start_date');
-        $table->date('end_date')->nullable();
-        $table->timestamps();
-
-    });
+        Schema::table('gurus', function (Blueprint $table) {
+            $table->decimal('gaji_pokok', 15, 2)->default(0)->after('telepon'); // Sesuaikan posisi
+        });
     }
 
     /**
@@ -26,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('events');
+        Schema::table('gurus', function (Blueprint $table) {
+            //
+        });
     }
 };

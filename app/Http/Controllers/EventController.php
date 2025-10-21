@@ -16,12 +16,25 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-       if ($request->ajax()) {
-        return response()->json(
-            \App\Models\Event::all(['id','title','start','end'])
-        );
-    }
-    return view('home');
+        $events = Event::all();
+
+        $formattedEvents = $events->map(function ($event) {
+            
+            // FullCalendar end date bersifat eksklusif (tidak termasuk).
+            $endDate = $event->end_date ? \Carbon\Carbon::parse($event->end_date)->addDay()->format('Y-m-d') : null;
+
+            return [
+                'id'    => $event->id,
+                'title' => $event->title,
+                'start' => $event->start_date,
+                'end'   => $endDate,
+                'allDay' => true,
+                'backgroundColor' => '#10B981', // Hijau
+                'borderColor' => '#059669',     // Hijau gelap
+            ];
+        });
+
+        return response()->json($formattedEvents);
     }
 
     /**
@@ -40,15 +53,15 @@ class EventController extends Controller
         // Validasi input
         $request->validate([
             'title' => 'required|string|max:255',
-            'start' => 'required|date',
-            'end'   => 'nullable|date|after_or_equal:start',
+            'start_date' => 'required|date',
+            'end_date'   => 'nullable|date|after_or_equal:start_date',
         ]);
 
         // Simpan ke database
         Event::create([
             'title' => $request->input('title'),
-            'start' => $request->input('start'),
-            'end'   => $request->input('end'),
+            'start_date' => $request->input('start_date'),
+            'end_date'   => $request->input('end_date'),
         ]);
 
         return redirect()->route('home')->with('success', 'Event berhasil ditambahkan!');
@@ -71,16 +84,16 @@ class EventController extends Controller
         // Validasi input
         $request->validate([
             'title' => 'required|string|max:255',
-            'start' => 'required|date',
-            'end'   => 'nullable|date|after_or_equal:start',
+            'start_date' => 'required|date',
+            'end_date'   => 'nullable|date|after_or_equal:start_date',
         ]);
 
         $event = Event::findOrFail($id);
 
         $event->update([
             'title' => $request->input('title'),
-            'start' => $request->input('start'),
-            'end'   => $request->input('end'),
+            'start_date' => $request->input('start_date'),
+            'end_date'   => $request->input('end_date'),
         ]);
 
         return redirect()->route('home')->with('success', 'Event berhasil diupdate!');

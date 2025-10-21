@@ -10,50 +10,71 @@ class KelasController extends Controller
 {
     public function index()
     {
-        $kelas = Kelas::all();
+        // Gunakan 'with' untuk eager loading data wali kelas agar lebih efisien
+        $kelas = Kelas::with('wali')->orderBy('tingkat')->orderBy('nama_kelas')->get();
         return view('kelas.index', compact('kelas'));
     }
 
     public function create()
     {
-         $gurus = Guru::all(); // Ambil semua guru
-    return view('kelas.create', compact('gurus'));
+        $gurus = Guru::orderBy('nama')->get(); // Ambil data guru untuk dropdown
+        return view('kelas.create', compact('gurus'));
     }
 
+    /**
+     * Menyimpan data kelas baru ke database.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-        'nama_kelas' => 'required|string|max:255',
-        'wali_kelas' => 'required|integer', // hanya 1 guru dipilih
+        // 🚨 1. VALIDASI DIPERBARUI SESUAI FORM BARU
+        $validated = $request->validate([
+            'tingkat' => 'required|in:10,11,12', // Validasi untuk dropdown Tingkat
+            'nama_kelas' => 'required|string|max:100', // Validasi untuk nama jurusan/kelas
+            'wali_kelas' => 'nullable|exists:gurus,id', // Validasi untuk Wali Kelas (opsional)
         ]);
 
-        \App\Models\Kelas::create([
-        'nama_kelas' => $request->nama_kelas,
-        'wali_kelas' => $request->wali_kelas, // simpan guru_id
-        ]);
+        // 🚨 2. PENYIMPANAN DATA DIPERBARUI
+        // Langsung menyimpan data yang sudah divalidasi.
+        // Ini mengasumsikan model Kelas Anda memiliki 'tingkat', 'nama_kelas', dan 'wali_kelas' di $fillable.
+        Kelas::create($validated);
 
-    return redirect()->route('kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
+        return redirect()->route('kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
 
-    public function edit(Kelas $kela)
+    /**
+     * Menampilkan form untuk mengedit kelas.
+     * Menggunakan Route Model Binding yang benar ($kelas).
+     */
+    public function edit(Kelas $kelas)
     {
-        return view('kelas.edit', ['kelas' => $kela]);
+        $gurus = Guru::orderBy('nama')->get();
+        return view('kelas.edit', compact('kelas', 'gurus'));
     }
 
-    public function update(Request $request, Kelas $kela)
+    /**
+     * Mengupdate data kelas yang ada.
+     */
+    public function update(Request $request, Kelas $kelas)
     {
-        $request->validate([
-            'nama_kelas' => 'required',
-            'wali_kelas' => 'nullable|string'
+        // 🚨 VALIDASI UPDATE DIPERBARUI
+        $validated = $request->validate([
+            'tingkat' => 'required|in:10,11,12',
+            'nama_kelas' => 'required|string|max:100',
+            'wali_kelas' => 'nullable|exists:gurus,id',
         ]);
 
-        $kela->update($request->all());
+        $kelas->update($validated);
+        
         return redirect()->route('kelas.index')->with('success', 'Kelas berhasil diperbarui.');
     }
 
-    public function destroy(Kelas $kela)
+    /**
+     * Menghapus data kelas.
+     */
+    public function destroy(Kelas $kelas)
     {
-        $kela->delete();
+        $kelas->delete();
         return redirect()->route('kelas.index')->with('success', 'Kelas berhasil dihapus.');
     }
 }
+

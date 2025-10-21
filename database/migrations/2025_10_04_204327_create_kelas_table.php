@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('wali_kelas')->nullable(); // guru yg jadi wali
             $table->timestamps();
 
-            $table->foreign('wali_kelas')->references('id')->on('guru')->onDelete('set null');
+            $table->foreign('wali_kelas')->references('id')->on('gurus')->onDelete('set null');
         });
     }
 

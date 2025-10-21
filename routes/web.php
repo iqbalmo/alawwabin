@@ -9,6 +9,9 @@ use App\Http\Controllers\MapelController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\KeuanganController;
+use App\Http\Controllers\GajiController;
 
 // 🔹 Halaman utama redirect ke /home
 Route::get('/', function () {
@@ -31,9 +34,15 @@ Route::middleware(['auth'])->group(function () {
     // CRUD Data Sekolah
     Route::resource('siswa', SiswaController::class);
     Route::resource('guru', GuruController::class);
-    Route::resource('kelas', KelasController::class);
+    Route::resource('kelas', KelasController::class)->parameter('kelas', 'kelas');
     Route::resource('mapels', MapelController::class);
     Route::resource('nilais', NilaiController::class);
+    Route::resource('jadwal', JadwalController::class);
+    Route::resource('keuangan', KeuanganController::class);
+    Route::resource('gaji', GajiController::class);
+
+    Route::get('/mapels/{mapel}/gurus', [MapelController::class, 'showGurus'])->name('mapels.gurus');
+    Route::post('/gaji/{guru}/bayar', [GajiController::class, 'bayar'])->name('gaji.bayar');
 
     // 🔹 Event untuk kalender
     Route::get('/events', [EventController::class, 'index'])->name('events.index');            // load data kalender
