@@ -20,15 +20,15 @@ class Event extends Model
      */
     protected $fillable = [
         'title',
-        'start',
-        'end',
+        'start_date',
+        'end_date',
     ];
 
     /**
      * Jika kolom tanggal ingin di-cast otomatis menjadi objek Carbon
      */
     protected $dates = [
-        'start',
-        'end',
+        'start_date',
+        'end_date',
     ];
 }

@@ -10,25 +10,26 @@ class GuruController extends Controller
 {
     public function index()
     {
-        $gurus = Guru::with('mapel')->get();  // tampilkan nama mapel
+        $gurus = Guru::with('mapel')->orderBy('nama', 'asc')->paginate(15);
         return view('guru.index', compact('gurus'));
     }
 
     public function create()
     {
-        $mapels = Mapel::all();  // ambil semua mapel untuk dropdown
+        $mapels = Mapel::all();
         return view('guru.create', compact('mapels'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nip' => 'required|string|max:20',
+            'nip' => 'required|string|max:20|unique:gurus,nip',
             'nama' => 'required|string|max:100',
-            'mapel_id' => 'required|exists:mapels,id',
+            // 🚨 DIPERBAIKI: Diubah dari 'required' menjadi 'nullable'
+            'mapel_id' => 'nullable|exists:mapels,id',
             'alamat' => 'required|string|max:255',
             'telepon' => 'nullable|string|max:15',
-         ]);
+       ]);
 
 
         Guru::create($request->all());
@@ -44,10 +45,12 @@ class GuruController extends Controller
     public function update(Request $request, Guru $guru)
     {
         $request->validate([
-            'nama' => 'required',
-            'mapel_id' => 'required',
-            'alamat' => 'required',
-            'telepon' => 'required'
+            'nip' => 'required|string|max:20|unique:gurus,nip,' . $guru->id,
+            'nama' => 'required|string|max:100',
+            // 🚨 DIPERBAIKI: Diubah dari 'required' menjadi 'nullable'
+            'mapel_id' => 'nullable|exists:mapels,id',
+            'alamat' => 'required|string|max:255',
+            'telepon' => 'nullable|string|max:15',
         ]);
 
         $guru->update($request->all());

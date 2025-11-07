@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Siswa;
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\Event; // 🚨 1. Tambahkan use statement untuk model Event
 
 class HomeController extends Controller
 {
@@ -16,7 +17,11 @@ class HomeController extends Controller
         $jumlahGuru  = Guru::count();
         $jumlahKelas = Kelas::count();
 
-        // kirim ke view dengan NAMA VARIABEL persis seperti di view
-        return view('home', compact('jumlahSiswa', 'jumlahGuru', 'jumlahKelas'));
+        // 🚨 2. Ambil data event dari database
+        // Diurutkan berdasarkan tanggal mulai yang paling dekat
+        $events = Event::orderBy('start_date', 'asc')->get(); 
+
+        // 🚨 3. Kirim semua variabel, TERMASUK $events, ke view
+        return view('home', compact('jumlahSiswa', 'jumlahGuru', 'jumlahKelas', 'events'));
     }
 }

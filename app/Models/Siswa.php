@@ -9,7 +9,56 @@ class Siswa extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama','nis','tanggal_lahir','kelas_id'];
+    // Ganti $fillable dengan semua kolom baru
+    protected $fillable = [
+        'kelas_id',
+        'nama',
+        'nis',
+        'tanggal_lahir',
+        'no_absen',
+        'nisn',
+        'nik_siswa',
+        'tempat_lahir',
+        'jenis_kelamin',
+        'no_kk',
+        'nama_ayah',
+        'ttl_ayah',
+        'pendidikan_ayah',
+        'pekerjaan_ayah',
+        'nama_ibu',
+        'ttl_ibu',
+        'pendidikan_ibu',
+        'pekerjaan_ibu',
+        'anak_ke',
+        'jumlah_saudara',
+        'sekolah_asal',
+        'status_mukim',
+        'nama_wali',
+        'ttl_wali',
+        'alamat_wali',
+        'pekerjaan_wali',
+        'alamat_orangtua',
+        'kelurahan',
+        'kecamatan',
+        'kota',
+        'provinsi',
+        'kodepos',
+        'hp_ayah',
+        'hp_ibu',
+        'email_ayah',
+        'email_ibu',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+        'anak_ke' => 'integer',
+        'jumlah_saudara' => 'integer',
+    ];
 
     public function kelas()
     {

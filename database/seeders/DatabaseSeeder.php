@@ -13,11 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Hapus factory default
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Panggil UserSeeder yang sudah kita buat
+        $this->call([
+            UserSeeder::class,
+            // Anda bisa tambahkan seeder lain di sini nanti
+            // Contoh: KelasSeeder::class, MapelSeeder::class,
         ]);
     }
 }

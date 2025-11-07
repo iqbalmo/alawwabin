@@ -20,6 +20,11 @@ class Mapel extends Model
         return $this->belongsTo(Guru::class);
     }
 
+    public function gurus()
+    {
+        return $this->hasMany(Guru::class, 'mapel_id');
+    }
+
     public function nilai()
     {
         return $this->hasMany(Nilai::class);

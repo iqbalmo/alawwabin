@@ -8,14 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Guru extends Model
 {
     use HasFactory;
+    protected $guarded = ['id'];
 
-    protected $fillable = [
-        'nip',
-        'nama',
-        'mapel_id',
-        'alamat',
-        'telepon'
-    ];
+    protected $fillable = ['nama', 'nip', 'mapel_id', 'telepon'];
 
     // Relasi ke Mapel
     public function mapel()
