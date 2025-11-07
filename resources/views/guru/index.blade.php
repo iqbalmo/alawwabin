@@ -33,6 +33,11 @@
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider sm:pl-6">Nama</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Mata Pelajaran</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Telepon</th>
+<<<<<<< HEAD
+=======
+                        {{-- 👇 KOLOM BARU 👇 --}}
+                        <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-[#333333] uppercase tracking-wider">Gaji Pokok (Rp)</th>
+>>>>>>> cf78c9c0fda47be5e7d14cb7c0d495b581d7e622
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                             <span class="sr-only">Aksi</span>
                         </th>
@@ -51,6 +56,13 @@
                             </td>
                             <td class="border-t border-gray-200 px-3 py-4 text-sm whitespace-nowrap">{{ $guru->mapel->nama_mapel ?? '-' }}</td>
                             <td class="border-t border-gray-200 px-3 py-4 text-sm whitespace-nowrap">{{ $guru->telepon }}</td>
+<<<<<<< HEAD
+=======
+                            {{-- 👇 DATA BARU 👇 --}}
+                            <td class="border-t border-gray-200 px-3 py-4 text-sm text-right whitespace-nowrap">
+                                {{ number_format($guru->gaji_pokok, 0, ',', '.') }}
+                            </td>
+>>>>>>> cf78c9c0fda47be5e7d14cb7c0d495b581d7e622
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                 <div class="flex items-center justify-end space-x-4">
                                     <a href="{{ route('guru.edit', $guru->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
