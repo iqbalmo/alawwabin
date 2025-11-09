@@ -35,6 +35,6 @@ class Kelas extends Model
      */
     public function wali()
     {
-        return $this->belongsTo(Guru::class, 'wali_kelas');
+        return $this->belongsTo(Guru::class, 'wali_kelas', 'id');
     }
 }

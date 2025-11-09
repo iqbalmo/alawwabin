@@ -8,14 +8,43 @@ use Illuminate\Database\Eloquent\Model;
 class Guru extends Model
 {
     use HasFactory;
-    protected $guarded = ['id'];
 
-    protected $fillable = ['nama', 'nip', 'mapel_id', 'telepon'];
+    // Tambahkan semua kolom baru ke $fillable
+    protected $fillable = [
+        'nama',
+        'nip',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'jenis_kelamin',
+        'pend_terakhir_tahun',
+        'pend_terakhir_univ',
+        'pend_terakhir_jurusan',
+        'tahun_mulai_bekerja',
+        'jabatan',
+        'status_kepegawaian',
+        'mapel_id',
+        'alamat',
+        'telepon',
+    ];
 
-    // Relasi ke Mapel
+    // Tambahkan casting untuk 'tanggal_lahir'
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+
+    /**
+     * Relasi ke mata pelajaran yang diampu.
+     */
     public function mapel()
     {
         return $this->belongsTo(Mapel::class, 'mapel_id');
-        return $this->hasMany(Mapel::class, 'guru_id');
+    }
+
+    /**
+     * Relasi ke kelas (jika dia adalah wali kelas).
+     */
+    public function wali()
+    {
+        return $this->hasOne(Kelas::class, 'wali_kelas');
     }
 }

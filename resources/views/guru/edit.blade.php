@@ -1,106 +1,143 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Guru | SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Edit Data Guru')
 
 @section('content')
-    {{-- Wrapper 'bg-slate-800' dihapus agar konsisten dengan form lain --}}
-    <div class="max-w-2xl mx-auto">
+<form action="{{ route('guru.update', $guru->id) }}" method="POST" class="bg-white shadow-md rounded-lg p-6 md:p-8">
+    @csrf
+    @method('PUT')
+    <div class="space-y-12">
 
-        <!-- Judul diubah ke Hijau Utama -->
-        <h2 class="text-2xl font-bold text-[#2C5F2D] mb-6">Edit Data Guru</h2>
+        <!-- Header Form -->
+        <div class="border-b border-gray-900/10 pb-12">
+            <h2 class="text-2xl font-bold tracking-tight text-[#2C5F2D]">Edit Data Guru</h2>
+            <p class="mt-2 text-sm text-gray-600">Perbarui data guru. Klik "Update" jika sudah benar.</p>
+        </div>
 
-        {{-- Blok Error Validasi (disesuaikan untuk tema terang) --}}
-        @if ($errors->any())
-            <div class="mb-6 rounded-md bg-red-500/20 p-4 border border-red-500/30">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                            fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-700">Terdapat {{ $errors->count() }} error:</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                            <ul role="list" class="list-disc list-inside space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
+        <!-- BAGIAN 1: DATA PRIBADI GURU -->
+        <div class="border-b border-gray-900/10 pb-12">
+            <h3 class="text-lg font-semibold leading-7 text-gray-900">1. Data Pribadi</h3>
+            <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-6">
+
+                <div class="md:col-span-3">
+                    <label for="nama" class="block text-sm font-medium leading-6 text-gray-900">Nama Lengkap <span class="text-red-600">*</span></label>
+                    <input type="text" name="nama" id="nama" value="{{ old('nama', $guru->nama) }}" required
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm @error('nama') border-red-500 @enderror">
+                    @error('nama') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label for="nip" class="block text-sm font-medium leading-6 text-gray-900">NIP</label>
+                    <input type="text" name="nip" id="nip" value="{{ old('nip', $guru->nip) }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm @error('nip') border-red-500 @enderror">
+                    @error('nip') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="tempat_lahir" class="block text-sm font-medium leading-6 text-gray-900">Tempat Lahir</label>
+                    <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir', $guru->tempat_lahir) }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="tanggal_lahir" class="block text-sm font-medium leading-6 text-gray-900">Tanggal Lahir</label>
+                    <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir', $guru->tanggal_lahir ? $guru->tanggal_lahir->format('Y-m-d') : '') }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label for="jenis_kelamin" class="block text-sm font-medium leading-6 text-gray-900">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                        <option value="">-- Pilih --</option>
+                        <option value="L" {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="P" {{ old('jenis_kelamin', $guru->jenis_kelamin) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                </div>
+                
+                <div class="md:col-span-6">
+                    <label for="alamat" class="block text-sm font-medium leading-6 text-gray-900">Alamat</label>
+                    <textarea id="alamat" name="alamat" rows="3" 
+                              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">{{ old('alamat', $guru->alamat) }}</textarea>
+                </div>
+
+                <div class="md:col-span-3">
+                    <label for="telepon" class="block text-sm font-medium leading-6 text-gray-900">No. Telepon/HP</label>
+                    <input type="text" name="telepon" id="telepon" value="{{ old('telepon', $guru->telepon) }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
                 </div>
             </div>
-        @endif
+        </div>
+        
+        <!-- BAGIAN 2: DATA KEPEGAWAIAN & PENDIDIKAN -->
+        <div class="border-b border-gray-900/10 pb-12">
+            <h3 class="text-lg font-semibold leading-7 text-gray-900">2. Data Kepegawaian & Pendidikan</h3>
+            <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-6">
 
-        <form action="{{ route('guru.update', $guru->id) }}" method="POST" class="space-y-6">
-            @csrf
-            @method('PUT')
+                <div class="md:col-span-3">
+                    <label for="jabatan" class="block text-sm font-medium leading-6 text-gray-900">Jabatan</label>
+                    <input type="text" name="jabatan" id="jabatan" value="{{ old('jabatan', $guru->jabatan) }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
 
-            {{-- Grup Form: Nama Guru --}}
-            <div>
-                <!-- Label diubah ke teks abu-abu gelap -->
-                <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Guru</label>
-                <!-- Input diubah ke style light mode -->
-                <input type="text" name="nama" id="nama"
-                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm"
-                    value="{{ old('nama', $guru->nama) }}" required>
-            </div>
-
-            {{-- Grup Form: NIP --}}
-            <div>
-                <label for="nip" class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                <input type="text" name="nip" id="nip"
-                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm"
-                    value="{{ old('nip', $guru->nip) }}" required>
-            </div>
-
-            {{-- Grup Form: Mata Pelajaran --}}
-            <div>
-                <label for="mapel_id" class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran Utama</label>
-                <select name="mapel_id" id="mapel_id"
-                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm">
-                    <option value="">-- Tidak Ditentukan --</option>
-                    @foreach ($mapels as $mapel)
-                        <option value="{{ $mapel->id }}"
-                            {{ old('mapel_id', $guru->mapel_id) == $mapel->id ? 'selected' : '' }}>
+                <div class="md:col-span-3">
+                    <label for="mapel_id" class="block text-sm font-medium leading-6 text-gray-900">Mata Pelajaran Utama</label>
+                    <select id="mapel_id" name="mapel_id" class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                        <option value="">-- Tidak Mengampu Mapel Utama --</option>
+                        @foreach($mapels as $mapel)
+                        <option value="{{ $mapel->id }}" {{ old('mapel_id', $guru->mapel_id) == $mapel->id ? 'selected' : '' }}>
                             {{ $mapel->nama_mapel }}
                         </option>
-                    @endforeach
-                </select>
-            </div>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label for="status_kepegawaian" class="block text-sm font-medium leading-6 text-gray-900">Status Kepegawaian</label>
+                    <select id="status_kepegawaian" name="status_kepegawaian" class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                        <option value="">-- Pilih Status --</option>
+                        <option value="PNS" {{ old('status_kepegawaian', $guru->status_kepegawaian) == 'PNS' ? 'selected' : '' }}>PNS</option>
+                        <option value="Swasta" {{ old('status_kepegawaian', $guru->status_kepegawaian) == 'Swasta' ? 'selected' : '' }}>Swasta/Honorer</option>
+                    </select>
+                </div>
 
-            {{-- Grup Form: Alamat --}}
-            <div>
-                <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-                <input type="text" name="alamat" id="alamat"
-                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm"
-                    value="{{ old('alamat', $guru->alamat) }}" required>
-            </div>
+                <div class="md:col-span-3">
+                    <label for="tahun_mulai_bekerja" class="block text-sm font-medium leading-6 text-gray-900">Tahun Mulai Bekerja</label>
+                    <input type="text" name="tahun_mulai_bekerja" id="tahun_mulai_bekerja" value="{{ old('tahun_mulai_bekerja', $guru->tahun_mulai_bekerja) }}" placeholder="Contoh: 2010"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
 
-            {{-- Grup Form: Telepon --}}
-            <div>
-                <label for="telepon" class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
-                <input type="text" name="telepon" id="telepon"
-                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm"
-                    value="{{ old('telepon', $guru->telepon) }}">
-            </div>
+                <div class="md:col-span-full"><h4 class="text-md font-medium text-gray-800 mt-6">Pendidikan Terakhir</h4></div>
 
-            {{-- Tombol Aksi --}}
-            <div class="flex items-center space-x-4 pt-4">
-                <!-- Tombol Update (Primary) diubah ke Aksen Emas -->
-                <button type="submit"
-                    class="bg-[#C8963E] hover:bg-[#b58937] text-[#333333] font-medium py-2 px-4 rounded-md shadow-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2">
-                    Update
-                </button>
-                <!-- Tombol Kembali (Secondary) diubah ke style outline terang -->
-                <a href="{{ route('guru.index') }}"
-                    class="bg-transparent hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-md border border-gray-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2">
-                    Kembali
-                </a>
+                <div class="md:col-span-3">
+                    <label for="pend_terakhir_univ" class="block text-sm font-medium leading-6 text-gray-900">Perguruan Tinggi</label>
+                    <input type="text" name="pend_terakhir_univ" id="pend_terakhir_univ" value="{{ old('pend_terakhir_univ', $guru->pend_terakhir_univ) }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="pend_terakhir_jurusan" class="block text-sm font-medium leading-6 text-gray-900">Jurusan</label>
+                    <input type="text" name="pend_terakhir_jurusan" id="pend_terakhir_jurusan" value="{{ old('pend_terakhir_jurusan', $guru->pend_terakhir_jurusan) }}"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
+
+                <div class="md:col-span-1">
+                    <label for="pend_terakhir_tahun" class="block text-sm font-medium leading-6 text-gray-900">Tahun Lulus</label>
+                    <input type="text" name="pend_terakhir_tahun" id="pend_terakhir_tahun" value="{{ old('pend_terakhir_tahun', $guru->pend_terakhir_tahun) }}" placeholder="Contoh: 2008"
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
+                </div>
             </div>
-        </form>
+        </div>
     </div>
+
+    <!-- Tombol Aksi -->
+    <div class="mt-6 flex items-center justify-end gap-x-6">
+        <a href="{{ route('guru.index') }}" class="text-sm font-semibold leading-6 text-gray-900">
+            Batal
+        </a>
+        <button type="submit"
+                class="rounded-md bg-[#2C5F2D] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#214621] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+            Update Data Guru
+        </button>
+    </div>
+</form>
 @endsection

@@ -11,12 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::create('gurus', function (Blueprint $table) {
+        Schema::create('gurus', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('nip')->unique();
-            $table->string('mata_pelajaran')->nullable();
-            $table->string('alamat')->nullable();
+            $table->string('nip')->nullable()->unique();
+            
+            // Atribut baru: Data Pribadi
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
+            
+            // Atribut baru: Pendidikan
+            $table->string('pend_terakhir_tahun', 4)->nullable();
+            $table->string('pend_terakhir_univ')->nullable();
+            $table->string('pend_terakhir_jurusan')->nullable();
+            
+            // Atribut baru: Kepegawaian
+            $table->string('tahun_mulai_bekerja', 4)->nullable();
+            $table->string('jabatan')->nullable();
+            $table->enum('status_kepegawaian', ['PNS', 'Swasta'])->nullable();
+
+            // Atribut lama yang dipertahankan
+            $table->foreignId('mapel_id')->nullable()->constrained('mapels')->onDelete('set null');
+            $table->text('alamat')->nullable();
+            $table->string('telepon')->nullable(); // Saya tambahkan 'telepon' karena ini penting
+
             $table->timestamps();
         });
     }

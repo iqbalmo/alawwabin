@@ -32,17 +32,11 @@
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">No</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Nama</th>
-<<<<<<< HEAD
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">NIS / NISN</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Jenis Kelamin</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Kelas</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Kontak Ayah</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Status</th>
-=======
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">NIS</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Kelas</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Tanggal Lahir</th>
->>>>>>> cf78c9c0fda47be5e7d14cb7c0d495b581d7e622
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
                             <span class="sr-only">Aksi</span>
                         </th>
@@ -53,7 +47,6 @@
                 <tbody class="text-gray-700">
                     @forelse($siswa as $s)
                         <tr>
-<<<<<<< HEAD
                             <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">
                                 {{-- Penomoran untuk paginasi --}}
                                 {{ ($siswa->currentPage() - 1) * $siswa->perPage() + $loop->iteration }}
@@ -102,22 +95,6 @@
                                         Edit<span class="sr-only">, {{ $s->nama }}</span>
                                     </a>
                                     <form action="{{ route('siswa.destroy', $s->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus siswa ini? Seluruh data terkait (nilai, dll) akan ikut terhapus.');">
-=======
-                            {{-- Border diubah ke abu-abu muda --}}
-                            <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">{{ $loop->iteration }}</td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm">
-                                <div class="font-bold text-[#333333]">{{ $s->nama }}</div>
-                            </td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $s->nis }}</td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $s->kelas->nama_kelas ?? '-' }}</td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $s->tanggal_lahir }}</td>
-                            <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                <div class="flex items-center justify-end space-x-4">
-                                    <a href="{{ route('siswa.edit', $s->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
-                                        Edit<span class="sr-only">, {{ $s->nama }}</span>
-                                    </a>
-                                    <form action="{{ route('siswa.destroy', $s->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus siswa ini?');">
->>>>>>> cf78c9c0fda47be5e7d14cb7c0d495b581d7e622
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800">
@@ -130,27 +107,19 @@
                     @empty
                         {{-- Tampilan jika tidak ada data --}}
                         <tr>
-<<<<<<< HEAD
                             <td colspan="8" class="border-t border-gray-200 py-8 text-center text-gray-500">
                                 Belum ada data siswa. <a href="{{ route('siswa.create') }}" class="font-medium text-[#2C5F2D] hover:text-[#214621]">Tambah siswa baru</a>.
-=======
-                            <td colspan="6" class="border-t border-gray-200 py-8 text-center text-gray-500">
-                                Tidak ada data siswa.
->>>>>>> cf78c9c0fda47be5e7d14cb7c0d495b581d7e622
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
-<<<<<<< HEAD
 
             {{-- Link Paginasi --}}
             <div class="mt-8">
                 {{ $siswa->links() }}
             </div>
 
-=======
->>>>>>> cf78c9c0fda47be5e7d14cb7c0d495b581d7e622
         </div>
     </div>
 </div>

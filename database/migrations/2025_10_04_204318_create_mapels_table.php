@@ -11,8 +11,6 @@ return new class extends Migration
         Schema::create('mapels', function (Blueprint $table) {
             $table->id();
             $table->string('nama_mapel');
-            $table->unsignedBigInteger('guru_id')->nullable();
-            $table->foreign('guru_id')->references('id')->on('gurus')->onDelete('set null');
             $table->timestamps();
         });
     }

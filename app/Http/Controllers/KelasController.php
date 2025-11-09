@@ -10,8 +10,14 @@ class KelasController extends Controller
 {
     public function index()
     {
-        // Gunakan 'with' untuk eager loading data wali kelas agar lebih efisien
-        $kelas = Kelas::with('wali')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+
+        $kelas = Kelas::with('wali') 
+                        ->orderBy('tingkat', 'asc')
+                        ->orderBy('nama_kelas', 'asc')
+                        ->paginate(15);
+        // -------------------------
+        
+        // Paginasi akan tetap berfungsi
         return view('kelas.index', compact('kelas'));
     }
 
@@ -28,7 +34,7 @@ class KelasController extends Controller
     {
         // 🚨 1. VALIDASI DIPERBARUI SESUAI FORM BARU
         $validated = $request->validate([
-            'tingkat' => 'required|in:10,11,12', // Validasi untuk dropdown Tingkat
+            'tingkat' => 'required|in:7,8,9', // Validasi untuk dropdown Tingkat
             'nama_kelas' => 'required|string|max:100', // Validasi untuk nama jurusan/kelas
             'wali_kelas' => 'nullable|exists:gurus,id', // Validasi untuk Wali Kelas (opsional)
         ]);
@@ -58,7 +64,7 @@ class KelasController extends Controller
     {
         // 🚨 VALIDASI UPDATE DIPERBARUI
         $validated = $request->validate([
-            'tingkat' => 'required|in:10,11,12',
+            'tingkat' => 'required|in:7,8,9',
             'nama_kelas' => 'required|string|max:100',
             'wali_kelas' => 'nullable|exists:gurus,id',
         ]);

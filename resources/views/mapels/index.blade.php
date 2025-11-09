@@ -4,12 +4,6 @@
 
 @section('content')
 
-@if(session('success'))
-    <div class="mb-4 rounded-md bg-green-100 p-4 text-sm font-medium text-green-700">
-        {{ session('success') }}
-    </div>
-@endif
-
 {{-- 1. Header Halaman (Judul, Deskripsi, dan Tombol) --}}
 <div class="sm:flex sm:items-center sm:justify-between">
     <div>

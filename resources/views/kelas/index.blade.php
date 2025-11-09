@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Kelas - SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Daftar Kelas - SITU Al-Awwabin')
 
 @section('content')
 
-{{-- 1. Header Halaman (Judul, Deskripsi, dan Tombol) --}}
+{{-- 1. Header Halaman --}}
 <div class="sm:flex sm:items-center sm:justify-between">
     <div>
         <h2 class="text-2xl font-bold tracking-tight text-[#2C5F2D]">Daftar Kelas</h2>
         <p class="mt-2 text-sm text-gray-600">
-            Daftar semua kelas yang tersedia beserta wali kelasnya.
+            Daftar semua kelas yang terdaftar di dalam sistem.
         </p>
     </div>
     <div class="mt-4 sm:mt-0 sm:ml-16">
@@ -20,32 +20,17 @@
     </div>
 </div>
 
-{{-- 2. Pesan Sukses (Success Alert) - Disesuaikan untuk tema terang --}}
-@if(session('success'))
-    <div class="mt-6 rounded-md bg-green-500/20 p-4 border border-green-500/30">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
-            </div>
-        </div>
-    </div>
-@endif
-
-{{-- 3. Wrapper Tabel untuk Responsivitas --}}
+{{-- 2. Wrapper Tabel --}}
 <div class="mt-8 flow-root">
     <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <table class="min-w-full">
                 
-                {{-- 4. Header Tabel --}}
+                {{-- 3. Header Tabel --}}
                 <thead class="sticky top-0 bg-[#F0E6D2]">
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">No</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Tingkat</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Nama Kelas</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Wali Kelas</th>
                         <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
@@ -54,22 +39,29 @@
                     </tr>
                 </thead>
 
-                {{-- 5. Body Tabel --}}
+                {{-- 4. Body Tabel --}}
                 <tbody class="text-gray-700">
                     @forelse($kelas as $k)
                         <tr>
-                            {{-- Border diubah ke abu-abu muda --}}
                             <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">{{ $loop->iteration }}</td>
+                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $k->tingkat }}</td>
                             <td class="border-t border-gray-200 px-3 py-5 text-sm">
                                 <div class="font-bold text-[#333333]">{{ $k->nama_kelas }}</div>
                             </td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $k->waliGuru->nama ?? '-' }}</td>
+                            
+                            {{-- --- INI BAGIAN PENTING --- --}}
+                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">
+                                {{-- Panggil relasi 'waliKelas', ambil 'nama'. Jika tidak ada, tampilkan '-' --}}
+                                {{ $k->wali->nama ?? '-' }}
+                            </td>
+                            {{-- ------------------------- --}}
+
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <div class="flex items-center justify-end space-x-4">
                                     <a href="{{ route('kelas.edit', $k->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
                                         Edit<span class="sr-only">, {{ $k->nama_kelas }}</span>
                                     </a>
-                                    <form action="{{ route('kelas.destroy', $k->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kelas ini?');">
+                                    <form action="{{ route('kelas.destroy', $k->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kelas ini? Ini akan menghapus semua siswa di dalamnya.');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800">
@@ -80,15 +72,20 @@
                             </td>
                         </tr>
                     @empty
-                        {{-- Tampilan jika tidak ada data --}}
                         <tr>
-                            <td colspan="4" class="border-t border-gray-200 py-8 text-center text-gray-500">
+                            <td colspan="5" class="border-t border-gray-200 py-8 text-center text-gray-500">
                                 Belum ada data kelas.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+
+            {{-- Tampilkan Link Paginasi --}}
+            <div class="mt-4">
+                {{ $kelas->links() }}
+            </div>
+
         </div>
     </div>
 </div>
