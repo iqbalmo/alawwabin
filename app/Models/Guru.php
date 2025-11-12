@@ -9,7 +9,6 @@ class Guru extends Model
 {
     use HasFactory;
 
-    // Tambahkan semua kolom baru ke $fillable
     protected $fillable = [
         'nama',
         'nip',
@@ -27,24 +26,29 @@ class Guru extends Model
         'telepon',
     ];
 
-    // Tambahkan casting untuk 'tanggal_lahir'
     protected $casts = [
         'tanggal_lahir' => 'date',
     ];
 
-    /**
-     * Relasi ke mata pelajaran yang diampu.
-     */
     public function mapel()
     {
         return $this->belongsTo(Mapel::class, 'mapel_id');
     }
 
-    /**
-     * Relasi ke kelas (jika dia adalah wali kelas).
-     */
     public function wali()
     {
         return $this->hasOne(Kelas::class, 'wali_kelas');
+    }
+
+    // Relasi ke User
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
+
+    // Relasi ke GuruLog
+    public function guruLogs()
+    {
+        return $this->hasMany(GuruLog::class);
     }
 }

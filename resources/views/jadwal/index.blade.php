@@ -73,7 +73,7 @@
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <div class="flex items-center justify-end space-x-4">
                                     {{-- (Tambahkan link Edit & Hapus di sini nanti) --}}
-                                    <a href="#" class="text-[#2C5F2D] hover:text-[#214621]">Edit</a>
+                                   <a href="{{ route('jadwal.edit', $jadwal->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">Edit</a>
                                 </div>
                             </td>
                         </tr>

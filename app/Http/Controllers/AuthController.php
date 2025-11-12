@@ -26,7 +26,14 @@ class AuthController extends Controller
             // 🚨 DIPERBAIKI: Regenerasi session untuk keamanan (mencegah session fixation)
             $request->session()->regenerate();
             
-            // 🚨 DIPERBAIKI: Redirect ke halaman yang dituju sebelumnya, atau ke 'home'
+            // 🚨 DIPERBAIKI: Redirect sesuai role user
+            $user = Auth::user();
+            
+            if ($user->role === 'guru') {
+                return redirect()->route('gurulog.index')->with('success', 'Berhasil login sebagai Guru');
+            }
+            
+            // Default redirect ke home untuk role lainnya
             return redirect()->intended(route('home'))->with('success', 'Berhasil login');
         }
 

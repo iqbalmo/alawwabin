@@ -9,7 +9,6 @@ class Siswa extends Model
 {
     use HasFactory;
 
-    // Ganti $fillable dengan semua kolom baru
     protected $fillable = [
         'kelas_id',
         'nama',
@@ -49,19 +48,21 @@ class Siswa extends Model
         'email_ibu',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'tanggal_lahir' => 'date',
         'anak_ke' => 'integer',
         'jumlah_saudara' => 'integer',
     ];
 
+    // Siswa punya satu kelas
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);
+    }
+
+    // Siswa punya banyak rekap
+    public function rekaps()
+    {
+        return $this->hasMany(Rekap::class);
     }
 }

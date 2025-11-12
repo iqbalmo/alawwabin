@@ -60,5 +60,30 @@ class JadwalController extends Controller
         return redirect()->route('jadwal.index')->with('success', 'Jadwal berhasil ditambahkan.');
     }
 
-    // (Anda bisa menambahkan fungsi edit, update, destroy di sini nanti)
+    public function edit($id)
+    {
+        $jadwal = Jadwal::findOrFail($id); // ambil data jadwal berdasarkan ID
+        $mapels = Mapel::all(); // ambil semua mapel untuk dropdown
+        $gurus  = Guru::all();  // ambil semua guru untuk dropdown
+        $kelas  = Kelas::all(); // ambil semua kelas untuk dropdown
+
+        return view('jadwal.edit', compact('jadwal', 'mapels', 'gurus', 'kelas'));
+    }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'hari' => 'required',
+            'jam_mulai' => 'required',
+            'jam_selesai' => 'required',
+            'mapel_id' => 'required',
+            'guru_id' => 'required',
+            'kelas_id' => 'required',
+        ]);
+
+            $jadwal = Jadwal::findOrFail($id);
+            $jadwal->update($request->all());
+
+            return redirect()->route('jadwal.index')->with('success', 'Jadwal berhasil diupdate!');
+    }
+
 }

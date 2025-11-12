@@ -19,7 +19,7 @@ class HomeController extends Controller
 
         // 🚨 2. Ambil data event dari database
         // Diurutkan berdasarkan tanggal mulai yang paling dekat
-        $events = Event::orderBy('start_date', 'asc')->get(); 
+        $events = Event::orderBy('start', 'asc')->get(); 
 
         // 🚨 3. Kirim semua variabel, TERMASUK $events, ke view
         return view('home', compact('jumlahSiswa', 'jumlahGuru', 'jumlahKelas', 'events'));

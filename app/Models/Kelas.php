@@ -9,32 +9,27 @@ class Kelas extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'nama_kelas',
-        'wali_kelas', // 🚨 DIPERBAIKI: Diubah dari 'guru_id' menjadi 'wali_kelas'
+        'wali_kelas', 
         'tingkat',
     ];
 
-    /**
-     * Mendefinisikan relasi "satu kelas memiliki banyak siswa".
-     */
+    // Satu kelas punya banyak siswa
     public function siswa()
     {
         return $this->hasMany(Siswa::class);
     }
 
-    /**
-     * 🚨 DIPERBAIKI: Mendefinisikan relasi "satu kelas memiliki satu wali kelas (guru)".
-     * Nama metode diubah dari 'waliGuru' menjadi 'wali' agar cocok dengan pemanggilan
-     * with('wali') di controller.
-     */
+    // Relasi ke wali kelas (guru)
     public function wali()
     {
         return $this->belongsTo(Guru::class, 'wali_kelas', 'id');
+    }
+
+    // Kelas punya banyak jadwal
+    public function jadwals()
+    {
+        return $this->hasMany(Jadwal::class);
     }
 }
