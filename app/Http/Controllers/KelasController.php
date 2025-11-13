@@ -15,13 +15,19 @@ class KelasController extends Controller
      */
     public function index()
     {
-        // PERBAIKAN: diubah dari 'wali' menjadi 'waliKelas'
-        $kelas = Kelas::with('wali') 
+
+        // 1. Tambahkan withCount('siswas')
+        $semuaKelas = Kelas::with('wali')
+                        ->withCount('siswa')
                         ->orderBy('tingkat', 'asc')
                         ->orderBy('nama_kelas', 'asc')
-                        ->paginate(15);
+                        ->get(); 
+
+        // 2. Kelompokkan hasilnya
+        $groupedKelas = $semuaKelas->groupBy('tingkat');
         
-        return view('kelas.index', compact('kelas'));
+        // 3. Kirim data yang sudah terkelompok ke view
+        return view('kelas.index', compact('groupedKelas'));
     }
 
     /**
