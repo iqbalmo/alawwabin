@@ -30,9 +30,7 @@ Dibangun menggunakan **Laravel 12**, dengan frontend yang responsif didukung ole
 - **Manajemen Data Guru** — CRUD untuk data guru dan staf pengajar.  
 - **Manajemen Kelas** — Mengelola kelas dan alokasi wali kelas.  
 - **Manajemen Mata Pelajaran (Mapel)** — Mengelola daftar mata pelajaran.  
-- **Manajemen Jadwal** — Mengatur jadwal pelajaran per kelas.  
-- **Manajemen Keuangan** — Melacak pemasukan dan pengeluaran sekolah.  
-- **Manajemen Gaji** — Mengelola data penggajian guru.  
+- **Manajemen Jadwal** — Mengatur jadwal pelajaran per kelas.   
 - **Sistem Autentikasi** — Sistem login yang aman untuk admin dan staf.  
 
 ---
