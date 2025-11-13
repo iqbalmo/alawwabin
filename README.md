@@ -6,7 +6,7 @@
 
 <h1 align="center">SITU Al-Awwabin</h1>
 <p align="center">
-  <strong>Sistem Informasi Terpadu (SITU) untuk MTs Al-Awwabin</strong>
+  <strong>Sistem Informasi Tata Usaha (SITU) untuk MTs Al-Awwabin</strong>
 </p>
 <p align="center">
   Sebuah aplikasi web internal untuk mengelola semua data akademik dan administratif sekolah secara terpusat.
@@ -17,8 +17,8 @@
 ## 🏫 Tentang Proyek
 
 **SITU Al-Awwabin** adalah *Sistem Informasi Sekolah (SIS)* modern yang dibangun untuk menyederhanakan dan mendigitalkan manajemen data di **MTs Al-Awwabin**.  
-Aplikasi ini mengelola berbagai hal mulai dari **data siswa yang sangat detail**, **data guru**, **manajemen kelas**, hingga **keuangan dan penjadwalan**.
-
+Aplikasi ini mengelola berbagai hal mulai dari **data siswa yang sangat detail**, **data guru**, dan **manajemen kelas**.
+.
 Dibangun menggunakan **Laravel 12**, dengan frontend yang responsif didukung oleh **Tailwind CSS** dan **Alpine.js**.
 
 ---
