@@ -4,83 +4,163 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelas;
 use App\Models\Guru;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class KelasController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-
+        // PERBAIKAN: diubah dari 'wali' menjadi 'waliKelas'
         $kelas = Kelas::with('wali') 
                         ->orderBy('tingkat', 'asc')
                         ->orderBy('nama_kelas', 'asc')
                         ->paginate(15);
-        // -------------------------
         
-        // Paginasi akan tetap berfungsi
         return view('kelas.index', compact('kelas'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        $gurus = Guru::orderBy('nama')->get(); // Ambil data guru untuk dropdown
+        $gurus = Guru::orderBy('nama', 'asc')->get();
         return view('kelas.create', compact('gurus'));
     }
 
     /**
-     * Menyimpan data kelas baru ke database.
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // 🚨 1. VALIDASI DIPERBARUI SESUAI FORM BARU
-        $validated = $request->validate([
-            'tingkat' => 'required|in:7,8,9', // Validasi untuk dropdown Tingkat
-            'nama_kelas' => 'required|string|max:100', // Validasi untuk nama jurusan/kelas
-            'wali_kelas' => 'nullable|exists:gurus,id', // Validasi untuk Wali Kelas (opsional)
+        $request->validate([
+            'tingkat' => 'required|string|max:20',
+            'nama_kelas' => [
+                'required',
+                'string',
+                'max:255',
+                // Aturan ini memeriksa: "nama_kelas" harus unik di tabel 'kelas'
+                // DIMANA "tingkat"-nya sama dengan yang diinput.
+                Rule::unique('kelas')->where(function ($query) use ($request) {
+                    return $query->where('tingkat', $request->tingkat);
+                }),
+            ],
+            'wali_kelas_id' => 'nullable|exists:gurus,id'
+        ], [
+            // Pesan error kustom agar lebih jelas
+            'nama_kelas.unique' => 'Kombinasi Tingkat dan Nama Kelas ini sudah ada.'
         ]);
 
-        // 🚨 2. PENYIMPANAN DATA DIPERBARUI
-        // Langsung menyimpan data yang sudah divalidasi.
-        // Ini mengasumsikan model Kelas Anda memiliki 'tingkat', 'nama_kelas', dan 'wali_kelas' di $fillable.
-        Kelas::create($validated);
+        Kelas::create([
+            'nama_kelas' => $request->nama_kelas,
+            'tingkat' => $request->tingkat,
+            'wali_kelas_id' => $request->wali_kelas_id,
+        ]);
 
         return redirect()->route('kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
 
     /**
-     * Menampilkan form untuk mengedit kelas.
-     * Menggunakan Route Model Binding yang benar ($kelas).
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Kelas  $kelas
+     * @return \Illuminate\Http\Response
      */
-    public function edit(Kelas $kelas)
+    // Parameter (Kelas $kelas) sudah benar (perbaikan dari Anda)
+    public function show(Kelas $kelas) 
     {
-        $gurus = Guru::orderBy('nama')->get();
+        // Eager load relasi 'waliKelas' (info guru)
+        // dan 'siswas' (daftar siswa di kelas itu).
+        
+        // PERBAIKAN: diubah dari 'wali' menjadi 'waliKelas'
+        $kelas->load(['siswa' => function ($query) {
+            $query->orderBy('no_absen', 'asc')->orderBy('nama', 'asc');
+        }, 'wali']);
+
+        // PERBAIKAN: Baris '$kelas = $kelas;' dihapus karena tidak perlu
+        
+        return view('kelas.show', compact('kelas'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    // Parameter (Kelas $kelas) sudah benar (perbaikan dari Anda)
+    public function edit(Kelas $kelas) 
+    {
+        $gurus = Guru::orderBy('nama', 'asc')->get();
+        
+        // PERBAIKAN: Baris '$kelas = $kelas;' dihapus karena tidak perlu
+        
         return view('kelas.edit', compact('kelas', 'gurus'));
     }
 
     /**
-     * Mengupdate data kelas yang ada.
+     * Update the specified resource in storage.
      */
-    public function update(Request $request, Kelas $kelas)
+    // Parameter (Kelas $kelas) sudah benar (perbaikan dari Anda)
+    public function update(Request $request, Kelas $kelas) 
     {
-        // 🚨 VALIDASI UPDATE DIPERBARUI
-        $validated = $request->validate([
-            'tingkat' => 'required|in:7,8,9',
-            'nama_kelas' => 'required|string|max:100',
-            'wali_kelas' => 'nullable|exists:gurus,id',
+        $request->validate([
+            'tingkat' => 'required|string|max:20',
+            'nama_kelas' => [
+                'required',
+                'string',
+                'max:255',
+                // Aturan yang sama, tapi 'ignore' (abaikan) ID kelas saat ini
+                Rule::unique('kelas')->where(function ($query) use ($request) {
+                    return $query->where('tingkat', $request->tingkat);
+                })->ignore($kelas->id), // $kela->id adalah ID kelas yg sedang diedit
+            ],
+            'wali_kelas_id' => 'nullable|exists:gurus,id'
+        ], [
+            'nama_kelas.unique' => 'Kombinasi Tingkat dan Nama Kelas ini sudah ada.'
         ]);
 
-        $kelas->update($validated);
-        
+        $kelas->update([
+            'nama_kelas' => $request->nama_kelas,
+            'tingkat' => $request->tingkat,
+            'wali_kelas_id' => $request->wali_kelas_id,
+        ]);
+
         return redirect()->route('kelas.index')->with('success', 'Kelas berhasil diperbarui.');
     }
 
     /**
-     * Menghapus data kelas.
+     * Remove the specified resource from storage.
      */
-    public function destroy(Kelas $kelas)
+    // Parameter (Kelas $kelas) sudah benar (perbaikan dari Anda)
+    public function destroy(Kelas $kelas) 
     {
+        // Peringatan: Hati-hati saat menghapus kelas, 
+        // pastikan relasi siswa sudah diatur (misal: onDelete('set null'))
         $kelas->delete();
         return redirect()->route('kelas.index')->with('success', 'Kelas berhasil dihapus.');
     }
-}
 
+    public function reorderAbsen(Kelas $kelas)
+    {
+        // 1. Ambil semua siswa di kelas ini, urutkan berdasarkan NAMA (A-Z)
+        $siswa = Siswa::where('kelas_id', $kelas->id)
+                        ->orderBy('nama', 'asc')
+                        ->get();
+
+        // 2. Loop melalui siswa yang sudah terurut
+        $nomorAbsen = 1;
+        foreach ($siswa as $siswa) {
+            // 3. Update nomor absen mereka satu per satu
+            $siswa->no_absen = $nomorAbsen;
+            $siswa->save(); // Simpan perubahan
+            $nomorAbsen++; // Tambah nomor untuk siswa berikutnya
+        }
+
+        // 4. Kembalikan ke halaman detail kelas dengan pesan sukses
+        return redirect()->route('kelas.show', $kelas->id)
+                         ->with('success', 'Nomor absen untuk ' . $siswa->count() . ' siswa di kelas ' . $kelas->nama_kelas . ' telah berhasil diurutkan.');
+    }
+}

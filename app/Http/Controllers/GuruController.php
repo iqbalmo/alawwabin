@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use App\Models\Mapel;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule; // Import Rule untuk validasi unique
+use Illuminate\Validation\Rule;
 
 class GuruController extends Controller
 {
     public function index()
     {
-        // Eager load relasi 'mapel' dan urutkan berdasarkan nama
+        // Pastikan .with('mapel') ada di sini
         $guru = Guru::with('mapel')
                     ->orderBy('nama', 'asc')
                     ->paginate(15);
@@ -27,7 +27,6 @@ class GuruController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi semua data baru
         $validatedData = $request->validate([
             'nama' => 'required|string|max:255',
             'nip' => 'nullable|string|max:100|unique:gurus,nip',
@@ -50,6 +49,20 @@ class GuruController extends Controller
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil ditambahkan.');
     }
 
+    // --- TAMBAHKAN METHOD BARU INI ---
+    /**
+     * Menampilkan halaman detail untuk satu guru.
+     */
+    public function show(Guru $guru)
+    {
+        // Eager load relasi 'mapel' (Mapel yg diampu) 
+        // dan 'kelasWali' (Kelas yg dia jadi walinya)
+        $guru->load('mapel', 'wali'); 
+        
+        return view('guru.show', compact('guru'));
+    }
+    // ---------------------------------
+
     public function edit(Guru $guru)
     {
         $mapels = Mapel::orderBy('nama_mapel', 'asc')->get();
@@ -58,7 +71,6 @@ class GuruController extends Controller
 
     public function update(Request $request, Guru $guru)
     {
-        // Validasi semua data baru, dengan 'ignore' untuk NIP
         $validatedData = $request->validate([
             'nama' => 'required|string|max:255',
             'nip' => [

@@ -37,14 +37,13 @@ Route::controller(AuthController::class)->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     // 🔹 CRUD Data Sekolah
-    Route::resources([
-        'siswa'  => SiswaController::class,
-        'guru'   => GuruController::class,
-        'kelas'  => KelasController::class,
-        'mapels' => MapelController::class,
-        'nilai'  => NilaiController::class,
-        'jadwal' => JadwalController::class,
-    ]);
+    Route::resource('siswa', SiswaController::class);
+    Route::resource('guru', GuruController::class);
+    Route::resource('kelas', KelasController::class)->parameter('kelas', 'kelas');
+    Route::resource('mapels', MapelController::class);
+    Route::resource('nilais', NilaiController::class);
+    Route::resource('jadwal', JadwalController::class);
+    Route::post('/kelas/{kelas}/reorder-absen', [KelasController::class, 'reorderAbsen'])->name('kelas.reorderAbsen');
 
     // 🔹 Relasi Mapel -> Guru
     Route::get('/mapel/{mapel}/guru', [MapelController::class, 'showGurus'])

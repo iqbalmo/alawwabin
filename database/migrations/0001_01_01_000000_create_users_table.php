@@ -35,10 +35,6 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-          Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'guru'])->default('guru')->after('password');
-            $table->foreignId('guru_id')->nullable()->after('role')->constrained('gurus')->onDelete('set null');
-        });
     }
 
     /**
@@ -49,8 +45,5 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['role', 'guru_id']);
-        });
     }
 };

@@ -43,21 +43,25 @@
                 <tbody class="text-gray-700">
                     @forelse($kelas as $k)
                         <tr>
-                            <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">{{ $loop->iteration }}</td>
+                            <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">{{ $loop->iteration + ($kelas->currentPage() - 1) * $kelas->perPage() }}</td>
                             <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $k->tingkat }}</td>
                             <td class="border-t border-gray-200 px-3 py-5 text-sm">
                                 <div class="font-bold text-[#333333]">{{ $k->nama_kelas }}</div>
                             </td>
                             
-                            {{-- --- INI BAGIAN PENTING --- --}}
                             <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">
-                                {{-- Panggil relasi 'waliKelas', ambil 'nama'. Jika tidak ada, tampilkan '-' --}}
-                                {{ $k->wali->nama ?? '-' }}
+                                {{ $k->wali?->nama ?? '-' }}
                             </td>
-                            {{-- ------------------------- --}}
 
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <div class="flex items-center justify-end space-x-4">
+                                    
+                                    {{-- --- TOMBOL BARU DITAMBAHKAN DI SINI --- --}}
+                                    <a href="{{ route('kelas.show', $k->id) }}" class="text-gray-600 hover:text-gray-900">
+                                        Detail<span class="sr-only">, {{ $k->nama_kelas }}</span>
+                                    </a>
+                                    {{-- ------------------------------------- --}}
+
                                     <a href="{{ route('kelas.edit', $k->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
                                         Edit<span class="sr-only">, {{ $k->nama_kelas }}</span>
                                     </a>

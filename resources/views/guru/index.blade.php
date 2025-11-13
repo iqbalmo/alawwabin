@@ -26,7 +26,7 @@
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <table class="min-w-full">
                 
-                {{-- 3. Header Tabel (Diperbarui) --}}
+                {{-- 3. Header Tabel --}}
                 <thead class="sticky top-0 bg-[#F0E6D2]">
                     <tr>
                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">No</th>
@@ -41,7 +41,7 @@
                     </tr>
                 </thead>
 
-                {{-- 4. Body Tabel (Diperbarui) --}}
+                {{-- 4. Body Tabel --}}
                 <tbody class="text-gray-700">
                     @forelse($guru as $g)
                         <tr>
@@ -65,8 +65,13 @@
                             </td>
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <div class="flex items-center justify-end space-x-4">
-                                    {{-- Nanti Anda bisa buatkan halaman 'show' untuk guru jika perlu --}}
-                                    {{-- <a href="#" class="text-gray-600 hover:text-gray-900">Detail</a> --}}
+                                    
+                                    {{-- --- TOMBOL BARU DITAMBAHKAN DI SINI --- --}}
+                                    <a href="{{ route('guru.show', $g->id) }}" class="text-gray-600 hover:text-gray-900">
+                                        Detail<span class="sr-only">, {{ $g->nama }}</span>
+                                    </a>
+                                    {{-- ------------------------------------- --}}
+
                                     <a href="{{ route('guru.edit', $g->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
                                         Edit<span class="sr-only">, {{ $g->nama }}</span>
                                     </a>

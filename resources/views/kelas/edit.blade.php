@@ -37,9 +37,9 @@
                         class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm"
                         required>
                     <option value="">Pilih Tingkat</option>
-                    <option value="10" {{ old('tingkat', $kelas->tingkat) == '10' ? 'selected' : '' }}>X (10)</option>
-                    <option value="11" {{ old('tingkat', $kelas->tingkat) == '11' ? 'selected' : '' }}>XI (11)</option>
-                    <option value="12" {{ old('tingkat', $kelas->tingkat) == '12' ? 'selected' : '' }}>XII (12)</option>
+                    <option value="7" {{ old('tingkat', $kelas->tingkat) == '7' ? 'selected' : '' }}>VII (7)</option>
+                    <option value="8" {{ old('tingkat', $kelas->tingkat) == '8' ? 'selected' : '' }}>VIII (8)</option>
+                    <option value="9" {{ old('tingkat', $kelas->tingkat) == '9' ? 'selected' : '' }}>IX (9)</option>
                 </select>
             </div>
 
@@ -48,7 +48,7 @@
                 <label for="nama_kelas" class="block text-sm font-medium text-gray-700 mb-1">Nama Jurusan/Kelas</label>
                 <input type="text" name="nama_kelas" id="nama_kelas" 
                        class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm" 
-                       placeholder="Contoh: MIPA 1, IPS 2, atau A" 
+                       placeholder="Contoh: A, B, C,..." 
                        value="{{ old('nama_kelas', $kelas->nama_kelas) }}" required>
             </div>
         </div>
