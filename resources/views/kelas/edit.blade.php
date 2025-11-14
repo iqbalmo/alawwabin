@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Kelas - SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Edit Kelas | SITU Al-Awwabin') {{-- Judul Tab Browser --}}
 
 @section('content')
 {{-- Container diubah ke wrapper form standar kita --}}

@@ -7,6 +7,7 @@ use App\Models\Guru;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class KelasController extends Controller
 {
@@ -168,5 +169,80 @@ class KelasController extends Controller
         // 4. Kembalikan ke halaman detail kelas dengan pesan sukses
         return redirect()->route('kelas.show', $kelas->id)
                          ->with('success', 'Nomor absen untuk ' . $siswa->count() . ' siswa di kelas ' . $kelas->nama_kelas . ' telah berhasil diurutkan.');
+    }
+
+    public function showPromotionTool()
+    {
+        // Ambil semua kelas, SUDAH LENGKAP dengan relasi
+        $allKelas = Kelas::with('wali')
+                         ->withCount('siswa') // <-- TAMBAHKAN INI
+                         ->orderBy('tingkat', 'asc')
+                         ->orderBy('nama_kelas', 'asc')
+                         ->get();
+        
+        // Kelompokkan kelas berdasarkan tingkat (untuk tampilan)
+        $groupedKelas = $allKelas->groupBy('tingkat');
+        
+        // Siapkan daftar kelas tujuan
+        $targetKelasList = $allKelas;
+
+        return view('kelas.promosi', compact('groupedKelas', 'targetKelasList'));
+    }
+    // ----------------------------
+
+    // --- METHOD INI TIDAK BERUBAH ---
+    public function processPromotion(Request $request)
+    {
+        $request->validate([
+            'promosi' => 'required|array',
+        ]);
+
+        $mappings = $request->input('promosi');
+        $luluskanSiswaCount = 0;
+        $pindahkanSiswaCount = 0;
+
+        DB::transaction(function () use ($mappings, &$luluskanSiswaCount, &$pindahkanSiswaCount) {
+            
+            foreach ($mappings as $sourceClassId => $targetAction) {
+                
+                if ($targetAction == 'jangan_pindahkan') {
+                    continue; 
+                }
+
+                if ($targetAction == 'luluskan') {
+                    $count = Siswa::where('kelas_id', $sourceClassId)->count();
+                    
+                    Siswa::where('kelas_id', $sourceClassId)
+                         ->update([
+                             'kelas_id' => null, 
+                             'status_mukim' => 'Lulus' 
+                         ]);
+                    
+                    $luluskanSiswaCount += $count;
+                }
+
+                if (is_numeric($targetAction)) {
+                    $targetClassId = (int)$targetAction;
+                    $count = Siswa::where('kelas_id', $sourceClassId)->count();
+
+                    Siswa::where('kelas_id', $sourceClassId)
+                         ->update([
+                             'kelas_id' => $targetClassId 
+                         ]);
+                    
+                    $pindahkanSiswaCount += $count;
+                }
+            }
+        });
+
+        $message = "Proses kenaikan kelas berhasil.";
+        if ($pindahkanSiswaCount > 0) {
+            $message .= " $pindahkanSiswaCount siswa telah dipindahkan ke kelas baru.";
+        }
+        if ($luluskanSiswaCount > 0) {
+            $message .= " $luluskanSiswaCount siswa telah diluluskan.";
+        }
+
+        return redirect()->route('kelas.index')->with('success', $message);
     }
 }

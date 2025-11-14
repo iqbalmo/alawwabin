@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Data Guru')
+@section('title', 'Edit Data Guru | SITU Al-Awwabin')
 
 @section('content')
 <form action="{{ route('guru.update', $guru->id) }}" method="POST" class="bg-white shadow-md rounded-lg p-6 md:p-8">

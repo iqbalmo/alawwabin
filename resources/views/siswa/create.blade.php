@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Siswa Baru')
+@section('title', 'Tambah Siswa Baru | SITU Al-Awwabin')
 
 @section('content')
     <form action="{{ route('siswa.store') }}" method="POST" class="bg-white shadow-md rounded-lg p-6 md:p-8">

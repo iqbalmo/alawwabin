@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Guru Pengajar - SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Guru Pengajar | SITU Al-Awwabin') {{-- Judul Tab Browser --}}
 
 @section('content')
 <div class="max-w-4xl mx-auto">

@@ -1,90 +1,102 @@
-{{-- 
-    File ini untuk di-include di app.blade.php
-    Berisi navigasi utama untuk sidebar desktop dan mobile.
---}}
 <nav class="flex flex-1 flex-col">
     <ul role="list" class="flex flex-1 flex-col gap-y-7">
         <li>
-            {{-- Daftar Link Utama --}}
             <ul role="list" class="-mx-2 space-y-1">
+                {{-- 1. DASBOR --}}
                 <li>
-                    <a href="{{ route('home') }}"
-                       class="{{ request()->routeIs('home') ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                        <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                             stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    <a href="{{ route('home') }}" 
+                       class="{{ request()->routeIs('home') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                        <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                         </svg>
-                        Dashboard
-                    </a>
-                </li>
-
-                {{-- Dropdown Data Master --}}
-                <li x-data="{ open: {{ request()->routeIs(['siswa.*', 'guru.*', 'kelas.*', 'mapels.*']) ? 'true' : 'false' }} }">
-                    <button @click="open = !open"
-                            class="{{ request()->routeIs(['siswa.*', 'guru.*', 'kelas.*', 'mapels.*']) ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6">
-                        <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                             stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.824-2.167-1.943-2.39a4.125 4.125 0 00-1.121.069c-.07.013-.138.028-.206.044m-7.228 0a4.125 4.125 0 01-1.533 2.493A9.337 9.337 0 0112 21.75a9.38 9.38 0 01-2.625-.372M6.35 13.028a9.337 9.337 0 01-4.121-.952 4.125 4.125 0 017.533 2.493m-7.533-2.493c.07-.013.138-.028.206-.044a4.125 4.125 0 011.121-.069c1.119.223 1.943 1.277 1.943 2.39v.003M4.88 8.072a4.125 4.125 0 017.533-2.493 9.337 9.337 0 014.121.952 4.125 4.125 0 01-7.533 2.493m7.533-2.493c-.07.013-.138.028-.206.044a4.125 4.125 0 00-1.121.069c-1.119-.223-1.943-1.277-1.943-2.39V5.625m0 0A9.337 9.337 0 0012 2.25a9.38 9.38 0 00-2.625.372M4.88 8.072L5 8.072m0 0l-.12.002M11.25 5.625v.003V5.625m0 0A9.337 9.337 0 0112 2.25a9.38 9.38 0 012.625.372m0 0V5.625m0 0l.12.002" />
-                        </svg>
-                        Data Master
-                        <svg :class="open ? 'rotate-90' : ''"
-                             class="ml-auto h-5 w-5 shrink-0 transform transition-colors duration-200 ease-in-out"
-                             viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                  clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <ul x-show="open" class="mt-1 px-2 space-y-1" x-cloak>
-                        <li>
-                            <a href="{{ route('siswa.index') }}"
-                               class="{{ request()->routeIs('siswa.*') ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex gap-x-3 rounded-md p-2 pl-11 text-sm leading-6 font-semibold">Siswa</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('guru.index') }}"
-                               class="{{ request()->routeIs('guru.*') ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex gap-x-3 rounded-md p-2 pl-11 text-sm leading-6 font-semibold">Guru</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('kelas.index') }}"
-                               class="{{ request()->routeIs('kelas.*') ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex gap-x-3 rounded-md p-2 pl-11 text-sm leading-6 font-semibold">Kelas</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('mapels.index') }}"
-                               class="{{ request()->routeIs('mapels.*') ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex gap-x-3 rounded-md p-2 pl-11 text-sm leading-6 font-semibold">Mata Pelajaran</a>
-                        </li>
-                    </ul>
-                </li>
-
-                {{-- Link Jadwal Guru --}}
-                <li>
-                    <a href="{{ route('jadwal.index') }}"
-                       class="{{ request()->routeIs('jadwal.*') ? 'bg-[#C8963E] text-[#333333]' : 'text-gray-300 hover:bg-[#C8963E] hover:text-[#333333]' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                        <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                             stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                        Jadwal Guru
+                        Dasbor
                     </a>
                 </li>
             </ul>
         </li>
-
-        {{-- Link Settings di Bagian Bawah --}}
-        <li class="mt-auto">
-            <a href="#"
-               class="text-gray-300 hover:bg-[#C8963E] hover:text-[#333333] group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6">
-                <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M9.594 3.94c.09-.542.56-1.003 1.11-1.226.55-.223 1.159-.223 1.709 0 .55.223 1.02.684 1.11 1.226M10.162 18.812c.09.542.56 1.004 1.11 1.227.55.223 1.159.223 1.709 0 .55-.223 1.02-.684 1.11-1.227m-5.181 2.353a.75.75 0 01.211-1.033 3.87 3.87 0 00-1.007-1.007.75.75 0 01-1.033-.21A11.13 11.13 0 012.5 10.5c0-1.57.312-3.072.872-4.44m17.256 0a.75.75 0 01-.21 1.033 3.87 3.87 0 00-1.007 1.007.75.75 0 01-1.033.21A11.13 11.13 0 0021.5 10.5c0 1.57-.312 3.072-.872 4.44m.21 1.033a.75.75 0 01-1.033.21 3.87 3.87 0 00-1.007-1.007.75.75 0 01-.21-1.033M3.372 19.24a.75.75 0 011.033-.21 3.87 3.87 0 001.007 1.007.75.75 0 01.21 1.033m13.2-1.618a.75.75 0 01-1.033.21 3.87 3.87 0 00-1.007-1.007.75.75 0 01-.21-1.033M10.5 14.25a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" />
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M12 10.5a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0z" />
-                </svg>
-                Settings
-            </a>
+        <li>
+            <div class="text-xs font-semibold leading-6 text-gray-400">DATA SEKOLAH</div>
+            <ul role="list" class="-mx-2 mt-2 space-y-1">
+                {{-- 2. DATA SISWA --}}
+                <li>
+                    <a href="{{ route('siswa.index') }}" 
+                       class="{{ request()->routeIs('siswa.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                        <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.003c0 1.113.285 2.16.786 3.07M15 19.128c.331.18.681.303 1.05.372m0 0c3.072.51 5.986.337 8.528-1.48.393-.272.602-.747.602-1.228 0-.481-.21-.956-.602-1.228-2.543-1.816-5.456-1.99-8.528-1.479a.998.998 0 00-.543.539c-.194.335-.194.74 0 1.076.262.454.68.804 1.155 1.021m-2.1 0c.369-.07.738-.19.1.05-.372M8.25 6.75h9m-9 3h9m-9 3h9m-9 3h9M3.75 6.75h.008v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 10.5h.008v.008H3.75V10.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 14.25h.008v.008H3.75V14.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 18h.008v.008H3.75V18zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                        </svg>
+                        Data Siswa
+                    </a>
+                </li>
+                {{-- 3. DATA GURU --}}
+                <li>
+                    <a href="{{ route('guru.index') }}" 
+                       class="{{ request()->routeIs('guru.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                       <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                       </svg>
+                        Data Guru
+                    </a>
+                </li>
+                
+                {{-- 4. MANAJEMEN KELAS (DROPDOWN) --}}
+                <li x-data="{ open: {{ request()->routeIs('kelas.*') ? 'true' : 'false' }} }">
+                    {{-- Tombol Dropdown Utama --}}
+                    <button @click="open = !open" 
+                            class="{{ request()->routeIs('kelas.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex w-full items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                        <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+                        </svg>
+                        Manajemen Kelas
+                        <svg class="ml-auto h-5 w-5 shrink-0 transform transition-transform" :class="{ 'rotate-180': open }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    {{-- --- INI BARIS YANG DIPERBAIKI --- --}}
+                    {{-- Sub-menu (pl-11 dihapus dari sini) --}}
+                    <ul x-show="open" x-transition class="mt-1 space-y-1">
+                        <li>
+                            {{-- pl-11 dan bg-green-700 ditambahkan di sini --}}
+                            <a href="{{ route('kelas.index') }}" 
+                               class="{{ request()->routeIs('kelas.index', 'kelas.create', 'kelas.edit', 'kelas.show') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
+                                      block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
+                                Daftar Kelas
+                            </a>
+                        </li>
+                        <li>
+                            {{-- pl-11 dan bg-green-700 ditambahkan di sini --}}
+                            <a href="{{ route('kelas.promotionTool') }}" 
+                               class="{{ request()->routeIs('kelas.promotionTool') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
+                                      block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
+                                Alat Kenaikan Kelas
+                            </a>
+                        </li>
+                    </ul>
+                    {{-- --------------------------------- --}}
+                </li>
+                
+                {{-- 5. DATA MAPEL --}}
+                <li>
+                    <a href="{{ route('mapels.index') }}" 
+                       class="{{ request()->routeIs('mapels.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                        <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" />
+                        </svg>
+                        Data Mata Pelajaran
+                    </a>
+                </li>
+                {{-- 6. DATA JADWAL --}}
+                <li>
+                    <a href="{{ route('jadwal.index') }}" 
+                       class="{{ request()->routeIs('jadwal.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                        <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-18 0h18" />
+                        </svg>
+                        Data Jadwal
+                    </a>
+                </li>
+            </ul>
         </li>
+        {{-- ... (sisa menu Anda) ... --}}
     </ul>
 </nav>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Mata Pelajaran - SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Daftar Mata Pelajaran | SITU Al-Awwabin') {{-- Judul Tab Browser --}}
 
 @section('content')
 

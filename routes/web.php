@@ -45,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('jadwal', JadwalController::class);
     Route::post('/kelas/{kelas}/reorder-absen', [KelasController::class, 'reorderAbsen'])->name('kelas.reorderAbsen');
 
+    Route::get('/manajemen-kelas/kenaikan-kelas', [KelasController::class, 'showPromotionTool'])->name('kelas.promotionTool');
+    Route::post('/manajemen-kelas/kenaikan-kelas', [KelasController::class, 'processPromotion'])->name('kelas.processPromotion');
+
     // 🔹 Relasi Mapel -> Guru
     Route::get('/mapel/{mapel}/guru', [MapelController::class, 'showGurus'])
         ->name('mapels.gurus');

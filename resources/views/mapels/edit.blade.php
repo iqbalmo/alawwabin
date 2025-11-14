@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Mata Pelajaran - SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Edit Mata Pelajaran | SITU Al-Awwabin') {{-- Judul Tab Browser --}}
 
 @section('content')
 {{-- Wrapper 'bg-slate-800' dihapus agar konsisten --}}

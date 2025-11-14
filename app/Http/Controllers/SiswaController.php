@@ -8,11 +8,29 @@ use Illuminate\Http\Request;
 
 class SiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request) // <-- Tambahkan 'Request $request'
     {
-        // Mengurutkan berdasarkan nama dan paginasi
-        $siswa = Siswa::with('kelas')->orderBy('nama', 'asc')->paginate(15);
-        return view('siswa.index', compact('siswa'));
+        // 1. Ambil kata kunci pencarian dari URL (contoh: ?search=budi)
+        $search = $request->query('search');
+
+        // 2. Mulai query builder
+        $query = Siswa::with('kelas');
+
+        // 3. Jika ada kata kunci pencarian, filter datanya
+        if ($search) {
+            // Kita cari di kolom 'nama' ATAU 'nis'
+            $query->where('nama', 'like', '%' . $search . '%')
+                  ->orWhere('nis', 'like', '%' . $search . '%');
+        }
+
+        // 4. Lanjutkan dengan sorting dan paginasi
+        $siswa = $query->orderBy('nama', 'asc')->paginate(15);
+
+        // 5. PENTING: Buat link paginasi tetap membawa kata kunci pencarian
+        $siswa->appends($request->query());
+
+        // 6. Kirim data siswa DAN kata kunci pencarian ke view
+        return view('siswa.index', compact('siswa', 'search'));
     }
 
     public function create()
