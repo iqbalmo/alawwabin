@@ -9,14 +9,29 @@ use Illuminate\Validation\Rule;
 
 class GuruController extends Controller
 {
-    public function index()
+    public function index(Request $request) // <-- Tambahkan 'Request $request'
     {
-        // Pastikan .with('mapel') ada di sini
-        $guru = Guru::with('mapel')
-                    ->orderBy('nama', 'asc')
-                    ->paginate(15);
-                    
-        return view('guru.index', compact('guru'));
+        // 1. Ambil kata kunci pencarian
+        $search = $request->query('search');
+
+        // 2. Mulai query builder
+        $query = Guru::with('mapel');
+
+        // 3. Jika ada kata kunci pencarian, filter datanya
+        if ($search) {
+            // Kita cari di kolom 'nama' ATAU 'nip'
+            $query->where('nama', 'like', '%' . $search . '%')
+                  ->orWhere('nip', 'like', '%' . $search . '%');
+        }
+
+        // 4. Lanjutkan dengan sorting dan paginasi
+        $guru = $query->orderBy('nama', 'asc')->paginate(15);
+
+        // 5. Buat link paginasi tetap membawa kata kunci pencarian
+        $guru->appends($request->query());
+
+        // 6. Kirim data guru DAN kata kunci pencarian ke view
+        return view('guru.index', compact('guru', 'search'));
     }
 
     public function create()

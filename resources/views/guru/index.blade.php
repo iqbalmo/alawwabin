@@ -20,6 +20,26 @@
     </div>
 </div>
 
+<div class="mt-6">
+    <form action="{{ route('guru.index') }}" method="GET" class="flex items-center space-x-3">
+        <div class="flex-grow max-w-sm">
+            <label for="search" class="sr-only">Cari guru</label>
+            <input type="text" name="search" id="search"
+                   class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm"
+                   placeholder="Cari berdasarkan nama atau NIP..."
+                   value="{{ $search ?? '' }}">
+        </div>
+        <button type="submit"
+                class="inline-flex items-center rounded-md border border-transparent bg-[#2C5F2D] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#214621] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            Cari
+        </button>
+        <a href="{{ route('guru.index') }}"
+           class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            Reset
+        </a>
+    </form>
+</div>
+
 {{-- 2. Wrapper Tabel --}}
 <div class="mt-8 flow-root">
     <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
