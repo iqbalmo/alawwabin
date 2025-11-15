@@ -44,6 +44,7 @@ class GuruController extends Controller
     {
         $validatedData = $request->validate([
             'nama' => 'required|string|max:255',
+            'gelar' => 'nullable|string|max:100',
             'nip' => 'nullable|string|max:100|unique:gurus,nip',
             'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',
@@ -88,6 +89,7 @@ class GuruController extends Controller
     {
         $validatedData = $request->validate([
             'nama' => 'required|string|max:255',
+            'gelar' => 'nullable|string|max:100',
             'nip' => [
                 'nullable',
                 'string',

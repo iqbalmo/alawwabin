@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Beranda | SITU Al-Awwabin')
+
 @section('content')
 
     <div class="space-y-8">

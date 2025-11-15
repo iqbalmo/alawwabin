@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Ekstrakurikuler')
+@section('title', 'Edit Ekstrakurikuler | SITU Al-Awwabin')
 @section('header-title', 'Edit Ekstrakurikuler')
 
 @section('content')

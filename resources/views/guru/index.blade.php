@@ -67,7 +67,7 @@
                         <tr>
                             <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">{{ $loop->iteration + ($guru->currentPage() - 1) * $guru->perPage() }}</td>
                             <td class="border-t border-gray-200 px-3 py-5 text-sm">
-                                <div class="font-bold text-[#333333]">{{ $g->nama }}</div>
+                                <div class="font-bold text-[#333333]">{{ $g->nama }} {{ $g->gelar }}</div>
                             </td>
                             <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $g->nip ?? '-' }}</td>
                             <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">{{ $g->jabatan ?? '-' }}</td>

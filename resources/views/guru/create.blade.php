@@ -19,10 +19,17 @@
             <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-6">
 
                 <div class="md:col-span-3">
-                    <label for="nama" class="block text-sm font-medium leading-6 text-gray-900">Nama Lengkap <span class="text-red-600">*</span></label>
+                    <label for="nama" class="block text-sm font-medium leading-6 text-gray-900">Nama Lengkap (Tanpa Gelar) <span class="text-red-600">*</span></label>
                     <input type="text" name="nama" id="nama" value="{{ old('nama') }}" required
                            class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm @error('nama') border-red-500 @enderror">
                     @error('nama') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label for="gelar" class="block text-sm font-medium leading-6 text-gray-900">Gelar Akademik (Opsional)</label>
+                    <input type="text" name="gelar" id="gelar" value="{{ old('gelar') }}"
+                           placeholder="Contoh: S.Kom., M.Pd."
+                           class="block w-full border-0 border-b-2 border-gray-200 bg-gray-50 px-3 py-1.5 focus:border-green-600 focus:ring-0 sm:text-sm">
                 </div>
                 
                 <div class="md:col-span-3">

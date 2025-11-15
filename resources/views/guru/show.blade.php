@@ -37,6 +37,10 @@
                     <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $guru->nama ?? '-' }}</dd>
                 </div>
                 <div class="md:col-span-3">
+                    <dt class="text-sm font-medium text-gray-500">Gelar</dt>
+                    <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $guru->gelar ?? '-' }}</dd>
+                </div>
+                <div class="md:col-span-3">
                     <dt class="text-sm font-medium text-gray-500">NIP</dt>
                     <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $guru->nip ?? '-' }}</dd>
                 </div>

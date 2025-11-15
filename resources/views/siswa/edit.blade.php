@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Data Siswa')
+@section('title', 'Edit Data Siswa | SITU Al-Awwabin')
 
 {{-- Judul ini akan muncul di header bar putih di atas --}}
 @section('header-title', 'Edit Data Siswa')
