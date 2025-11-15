@@ -93,7 +93,8 @@
         {{-- 3. Main Layout --}}
         <div class="lg:pl-64 flex flex-col h-full">
             {{-- Header / Topbar --}}
-            <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+            <div class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-yellow-900/10 bg-gray-50 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8"
+                 style="background-image: repeating-linear-gradient( -45deg, hsla(42, 57%, 51%, 0.05), hsla(42, 57%, 51%, 0.05) 1px, transparent 1px, transparent 8px );">
                 <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
                     <span class="sr-only">Buka sidebar</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -103,11 +104,17 @@
                     </svg>
                 </button>
 
-                <div class="flex-1">
-                    <h1 class="text-xl font-semibold text-[#333333]">
-                        @yield('header-title', 'Dashboard')
-                    </h1>
-                </div>
+                <nav class="flex flex-1" aria-label="Breadcrumb">
+                        <ol role="list" class="flex items-center space-x-2 text-sm font-semibold">
+                            
+                            @section('breadcrumbs')
+                                <li>
+                                    <span class="text-gray-900">Sistem Informasi Tata Usaha Al-Awwabin</span>
+                                </li>
+                            @show
+
+                        </ol>
+                    </nav>
 
                 {{-- Menu kanan (notifikasi + profil) --}}
                 <div class="flex items-center gap-x-4 lg:gap-x-6">
@@ -141,7 +148,9 @@
                         <div x-show="open" @click.away="open = false" x-transition
                              class="absolute right-0 z-10 mt-2.5 w-48 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
                              x-cloak>
-                            <a href="#" class="block px-3 py-1 text-sm leading-6 text-gray-900 hover:bg-gray-50">Profil Anda</a>
+                            <a href="{{ route('password.edit') }}" class="block px-3 py-1 text-sm leading-6 text-gray-900 hover:bg-gray-50">
+                                    Ubah Password
+                                </a>
                             <a href="{{ route('logout') }}"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                class="block px-3 py-1 text-sm leading-6 text-gray-900 hover:bg-gray-50">

@@ -8,25 +8,30 @@ use Illuminate\Http\Request;
 
 class SiswaController extends Controller
 {
-    public function index(Request $request) // <-- Tambahkan 'Request $request'
+    public function index(Request $request)
     {
-        // 1. Ambil kata kunci pencarian dari URL (contoh: ?search=budi)
+        // 1. Ambil kata kunci pencarian
         $search = $request->query('search');
 
-        // 2. Mulai query builder
-        $query = Siswa::with('kelas');
+        // 2. Mulai query builder, HANYA ambil siswa yang 'status_mukim' BUKAN 'Lulus'
+        $query = Siswa::with('kelas')
+                      ->where(function ($q) {
+                          $q->where('status_mukim', '!=', 'Lulus')
+                            ->orWhereNull('status_mukim');
+                      });
 
         // 3. Jika ada kata kunci pencarian, filter datanya
         if ($search) {
-            // Kita cari di kolom 'nama' ATAU 'nis'
-            $query->where('nama', 'like', '%' . $search . '%')
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
                   ->orWhere('nis', 'like', '%' . $search . '%');
+            });
         }
 
         // 4. Lanjutkan dengan sorting dan paginasi
         $siswa = $query->orderBy('nama', 'asc')->paginate(15);
 
-        // 5. PENTING: Buat link paginasi tetap membawa kata kunci pencarian
+        // 5. Buat link paginasi tetap membawa kata kunci pencarian
         $siswa->appends($request->query());
 
         // 6. Kirim data siswa DAN kata kunci pencarian ke view
@@ -96,11 +101,27 @@ class SiswaController extends Controller
      */
     public function show(Siswa $siswa)
     {
-        // Kita sudah mendapatkan $siswa berkat Route Model Binding
-        // Eager load relasi 'kelas' untuk memastikan datanya ada
-        $siswa->load('kelas'); 
+        // Muat relasi 'kelas' DAN 'ekstrakurikulers'
+        $siswa->load('kelas', 'ekstrakurikulers.pembina'); 
         
         return view('siswa.show', compact('siswa'));
+    }
+
+    public function archive()
+    {
+        // 1. Ambil semua siswa yang statusnya 'Lulus'
+        $arsipSiswa = Siswa::where('status_mukim', 'Lulus')
+                            ->orderBy('updated_at', 'desc') // Urutan 1: Tahun Lulus (Terbaru dulu)
+                            ->orderBy('nama', 'asc')       // Urutan 2: Nama Siswa (A-Z)
+                            ->get();
+
+        // 2. Kelompokkan siswa berdasarkan TAHUN kelulusan mereka
+        $arsipPerTahun = $arsipSiswa->groupBy(function($siswa) {
+            return $siswa->updated_at->format('Y'); // Group by year (e.g., "2025", "2024")
+        });
+        
+        // 3. Kirim data yang sudah terkelompok ke view baru
+        return view('siswa.arsip', compact('arsipPerTahun'));
     }
 
     public function edit(Siswa $siswa)

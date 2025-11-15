@@ -20,16 +20,35 @@
             <div class="text-xs font-semibold leading-6 text-gray-400">DATA SEKOLAH</div>
             <ul role="list" class="-mx-2 mt-2 space-y-1">
                 {{-- 2. DATA SISWA --}}
-                <li>
-                    <a href="{{ route('siswa.index') }}" 
-                       class="{{ request()->routeIs('siswa.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-                        
+                <li x-data="{ open: {{ request()->routeIs('siswa.*') ? 'true' : 'false' }} }">
+                    {{-- Tombol Dropdown Utama --}}
+                    <button @click="open = !open" 
+                            class="{{ request()->routeIs('siswa.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex w-full items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                         <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.697 50.697 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5z" />
                         </svg>
-
                         Data Siswa
-                    </a>
+                        <svg class="ml-auto h-5 w-5 shrink-0 transform transition-transform" :class="{ 'rotate-180': open }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    {{-- Sub-menu --}}
+                    <ul x-show="open" x-transition class="mt-1 space-y-1">
+                        <li>
+                            <a href="{{ route('siswa.index') }}" 
+                               class="{{ request()->routeIs('siswa.index', 'siswa.create', 'siswa.edit', 'siswa.show') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
+                                      block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
+                                Daftar Siswa Aktif
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('siswa.archive') }}" 
+                               class="{{ request()->routeIs('siswa.archive') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
+                                      block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
+                                Arsip Lulusan
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 {{-- 3. DATA GURU --}}
@@ -110,6 +129,16 @@
                                 d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-18 0h18" />
                         </svg>
                         Data Jadwal
+                    </a>
+                </li>
+                {{-- 7. EKSKUL --}}
+                <li>
+                    <a href="{{ route('ekskul.index') }}" 
+                       class="{{ request()->routeIs('ekskul.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                        <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                        </svg>
+                        Ekstrakurikuler
                     </a>
                 </li>
             </ul>

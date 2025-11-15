@@ -4,18 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AuthController,
     EventController,
-    GajiController,
     GuruController,
     GuruLogController,
     HomeController,
     JadwalController,
     KelasController,
-    KeuanganController,
     MapelController,
     NilaiController,
     SiswaController,
     RiwayatController,
-    RekapController
+    RekapController,
+    EkskulController
 };
 
 // 🔹 Redirect root ke dashboard home
@@ -36,6 +35,11 @@ Route::controller(AuthController::class)->group(function () {
 // 🔹 Semua route yang butuh login
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/ubah-password', [AuthController::class, 'showPasswordForm'])->name('password.edit');
+    Route::post('/ubah-password', [AuthController::class, 'updatePassword'])->name('password.update');
+
+    Route::get('/siswa/arsip', [SiswaController::class, 'archive'])->name('siswa.archive');
+
     // 🔹 CRUD Data Sekolah
     Route::resource('siswa', SiswaController::class);
     Route::resource('guru', GuruController::class);
@@ -43,10 +47,22 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('mapels', MapelController::class);
     Route::resource('nilais', NilaiController::class);
     Route::resource('jadwal', JadwalController::class);
+    Route::resource('ekskul', EkskulController::class);
+    
+    // --- TAMBAHKAN DUA RUTE INI ---
+    Route::post('/ekskul/{ekskul}/attach', [EkskulController::class, 'attachSiswa'])->name('ekskul.attachSiswa');
+    Route::post('/ekskul/{ekskul}/detach/{siswa}', [EkskulController::class, 'detachSiswa'])->name('ekskul.detachSiswa');
+
     Route::post('/kelas/{kelas}/reorder-absen', [KelasController::class, 'reorderAbsen'])->name('kelas.reorderAbsen');
 
     Route::get('/manajemen-kelas/kenaikan-kelas', [KelasController::class, 'showPromotionTool'])->name('kelas.promotionTool');
-    Route::post('/manajemen-kelas/kenaikan-kelas', [KelasController::class, 'processPromotion'])->name('kelas.processPromotion');
+    
+    // RUTE BARU (untuk menampilkan halaman checkbox per kelas)
+    Route::get('/manajemen-kelas/promosi/{kelas}', [KelasController::class, 'showClassPromotionForm'])->name('kelas.showPromotionForm');
+    
+    // Rute LAMA (dulu 'processPromotion', sekarang kita ganti nama agar lebih jelas)
+    // Ini adalah tujuan form checkbox
+    Route::post('/manajemen-kelas/promosi/proses', [KelasController::class, 'processClassPromotion'])->name('kelas.processPromotion');
 
     // 🔹 Relasi Mapel -> Guru
     Route::get('/mapel/{mapel}/guru', [MapelController::class, 'showGurus'])

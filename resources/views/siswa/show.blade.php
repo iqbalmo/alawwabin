@@ -28,9 +28,15 @@
     {{-- Fungsi Bantuan untuk Menampilkan Data --}}
     @php
     function renderDetail($label, $value, $default = '-') {
+        // Logika untuk menangani nilai boolean atau null
+        $displayValue = $value;
+        if (is_bool($value)) {
+            $displayValue = $value ? 'Ya' : 'Tidak';
+        }
+        
         echo '<div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">';
         echo '<dt class="text-sm font-medium text-gray-500">' . e($label) . '</dt>';
-        echo '<dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">' . ($value ? e($value) : $default) . '</dd>';
+        echo '<dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">' . ($displayValue ? e($displayValue) : $default) . '</dd>';
         echo '</div>';
     }
     @endphp
@@ -91,7 +97,6 @@
             @endphp
             
             {{-- BAGIAN 4: DATA WALI (OPSIONAL) --}}
-            {{-- Hanya tampilkan bagian ini jika nama wali diisi --}}
             @if($siswa->nama_wali)
                 <div class="bg-gray-50 px-4 py-3 sm:px-6">
                     <h4 class="text-lg font-medium text-gray-900">Data Wali (Opsional)</h4>
@@ -103,6 +108,31 @@
                 renderDetail('Alamat Wali', $siswa->alamat_wali);
                 @endphp
             @endif
+
+            {{-- BAGIAN 5: EKSTRAKURIKULER --}}
+            <div class="bg-gray-50 px-4 py-3 sm:px-6">
+                <h4 class="text-lg font-medium text-gray-900">Aktivitas Ekstrakurikuler</h4>
+            </div>
+            <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Ekskul yang Diikuti</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                    
+                    @if($siswa->ekstrakurikulers->isEmpty())
+                        <span class="text-gray-500 italic">Siswa ini tidak terdaftar di ekstrakurikuler manapun.</span>
+                    @else
+                        {{-- Tampilkan sebagai daftar badge/tag --}}
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($siswa->ekstrakurikulers as $ekskul)
+                                <a href="{{ route('ekskul.show', $ekskul->id) }}"
+                                   class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800 hover:bg-green-200 transition-colors">
+                                    {{ $ekskul->nama_ekskul }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
+                </dd>
+            </div>
 
         </dl>
     </div>

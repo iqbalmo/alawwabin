@@ -175,74 +175,99 @@ class KelasController extends Controller
     {
         // Ambil semua kelas, SUDAH LENGKAP dengan relasi
         $allKelas = Kelas::with('wali')
-                         ->withCount('siswa') // <-- TAMBAHKAN INI
+                         ->withCount('siswa') // Untuk menampilkan jumlah siswa
                          ->orderBy('tingkat', 'asc')
                          ->orderBy('nama_kelas', 'asc')
                          ->get();
         
         // Kelompokkan kelas berdasarkan tingkat (untuk tampilan)
         $groupedKelas = $allKelas->groupBy('tingkat');
-        
-        // Siapkan daftar kelas tujuan
-        $targetKelasList = $allKelas;
 
-        return view('kelas.promosi', compact('groupedKelas', 'targetKelasList'));
+        return view('kelas.promosi', compact('groupedKelas'));
     }
-    // ----------------------------
 
-    // --- METHOD INI TIDAK BERUBAH ---
-    public function processPromotion(Request $request)
+    // --- METHOD 2: Menampilkan Halaman CHECKBOX (BARU) ---
+    public function showClassPromotionForm(Kelas $kelas)
+    {
+        // 1. Ambil data kelas ini dan siswanya (diurutkan)
+        $kelas = $kelas->load(['siswa' => function ($query) {
+            $query->orderBy('nama', 'asc');
+        }]);
+
+        // 2. Siapkan daftar kelas tujuan (Target)
+        $targetKelasList = collect([]); // default koleksi kosong
+        
+        // Jika ini BUKAN kelas akhir (bukan 9)
+        if ($kelas->tingkat < 9) { // Asumsi 9 adalah tingkat akhir
+            $targetTingkat = (int)$kelas->tingkat + 1;
+            $targetKelasList = Kelas::where('tingkat', $targetTingkat)
+                                    ->orderBy('nama_kelas', 'asc')
+                                    ->get();
+        }
+
+        return view('kelas.promosi_detail', compact('kelas', 'targetKelasList'));
+    }
+
+
+    // --- METHOD 3: Memproses CHECKBOX (Logika tidak berubah, nama di rute berubah) ---
+    public function processClassPromotion(Request $request)
     {
         $request->validate([
-            'promosi' => 'required|array',
+            'action' => 'required|in:pindahkan,luluskan,tinggal', // Tambah aksi 'tinggal'
+            'siswa_ids' => 'nullable|array', // Dibuat nullable, karena 'tinggal' mungkin tidak mengirim ID
+            'siswa_ids.*' => 'exists:siswas,id',
+            'target_kelas_id' => 'required_if:action,pindahkan|exists:kelas,id',
+            'kelas_asal_id' => 'required|exists:kelas,id', // Tambahkan ini untuk tahu kelas mana yg diproses
         ]);
 
-        $mappings = $request->input('promosi');
-        $luluskanSiswaCount = 0;
-        $pindahkanSiswaCount = 0;
+        $siswaIds = $request->input('siswa_ids', []); // Default array kosong jika tidak ada yg dicentang
+        $action = $request->input('action');
+        $totalCount = count($siswaIds);
+        $kelasAsalId = $request->input('kelas_asal_id');
 
-        DB::transaction(function () use ($mappings, &$luluskanSiswaCount, &$pindahkanSiswaCount) {
+        // Jika aksinya "Tinggal Kelas", tidak ada yang perlu dilakukan
+        if ($action == 'tinggal') {
+             return redirect()->route('kelas.showPromotionForm', $kelasAsalId)
+                         ->with('success', 'Tidak ada siswa yang dipindahkan dari kelas ini.');
+        }
+
+        // Jika aksinya Pindah atau Lulus tapi tidak ada siswa yang dicentang
+        if (empty($siswaIds)) {
+            return redirect()->route('kelas.showPromotionForm', $kelasAsalId)
+                         ->with('error', 'Anda tidak memilih siswa untuk dipindahkan atau diluluskan.');
+        }
+
+        $message = "";
+
+        // Gunakan Transaksi Database
+        DB::transaction(function () use ($siswaIds, $action, $request, &$message, $totalCount) {
             
-            foreach ($mappings as $sourceClassId => $targetAction) {
+            if ($action == 'pindahkan') {
+                $targetKelasId = $request->input('target_kelas_id');
+                $targetKelas = Kelas::find($targetKelasId);
+
+                Siswa::whereIn('id', $siswaIds)
+                     ->update([
+                         'kelas_id' => $targetKelasId,
+                         'no_absen' => null // Kosongkan no absen
+                     ]);
                 
-                if ($targetAction == 'jangan_pindahkan') {
-                    continue; 
-                }
+                $message = "Berhasil memindahkan $totalCount siswa ke kelas $targetKelas->tingkat - $targetKelas->nama_kelas.";
 
-                if ($targetAction == 'luluskan') {
-                    $count = Siswa::where('kelas_id', $sourceClassId)->count();
-                    
-                    Siswa::where('kelas_id', $sourceClassId)
-                         ->update([
-                             'kelas_id' => null, 
-                             'status_mukim' => 'Lulus' 
-                         ]);
-                    
-                    $luluskanSiswaCount += $count;
-                }
-
-                if (is_numeric($targetAction)) {
-                    $targetClassId = (int)$targetAction;
-                    $count = Siswa::where('kelas_id', $sourceClassId)->count();
-
-                    Siswa::where('kelas_id', $sourceClassId)
-                         ->update([
-                             'kelas_id' => $targetClassId 
-                         ]);
-                    
-                    $pindahkanSiswaCount += $count;
-                }
+            } elseif ($action == 'luluskan') {
+                
+                Siswa::whereIn('id', $siswaIds)
+                     ->update([
+                         'kelas_id' => null, 
+                         'status_mukim' => 'Lulus',
+                         'no_absen' => null
+                     ]);
+                
+                $message = "Berhasil meluluskan $totalCount siswa.";
             }
         });
 
-        $message = "Proses kenaikan kelas berhasil.";
-        if ($pindahkanSiswaCount > 0) {
-            $message .= " $pindahkanSiswaCount siswa telah dipindahkan ke kelas baru.";
-        }
-        if ($luluskanSiswaCount > 0) {
-            $message .= " $luluskanSiswaCount siswa telah diluluskan.";
-        }
-
-        return redirect()->route('kelas.index')->with('success', $message);
+        // Kembalikan ke halaman checkbox TADI
+        return redirect()->route('kelas.showPromotionForm', $kelasAsalId)->with('success', $message);
     }
 }

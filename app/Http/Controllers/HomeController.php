@@ -13,7 +13,9 @@ class HomeController extends Controller
     public function index()
     {
         // ambil jumlah masing2 tabel
-        $jumlahSiswa = Siswa::count();
+        $jumlahSiswa = Siswa::where('status_mukim', '!=', 'Lulus')
+                        ->orWhereNull('status_mukim')
+                        ->count();
         $jumlahGuru  = Guru::count();
         $jumlahKelas = Kelas::count();
 

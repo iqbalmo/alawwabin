@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User; // <-- Tambahkan ini
 
 class AuthController extends Controller
 {
@@ -52,5 +54,44 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    public function showPasswordForm()
+    {
+        return view('auth.password'); // Kita akan buat view ini
+    }
+
+    /**
+     * Memproses perubahan password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        // 1. Validasi input
+        $request->validate([
+            'current_password' => [
+                'required',
+                // Cek apakah password saat ini cocok
+                function ($attribute, $value, $fail) use ($user) {
+                    if (!Hash::check($value, $user->password)) {
+                        $fail('Password saat ini tidak cocok.');
+                    }
+                },
+            ],
+            'new_password' => 'required|string|min:8|confirmed', // 'confirmed' akan otomatis mencocokkan dengan 'new_password_confirmation'
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.min' => 'Password baru minimal harus 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ]);
+
+        // 2. Update password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // 3. Redirect kembali dengan pesan sukses
+        return redirect()->route('password.edit')->with('success', 'Password Anda telah berhasil diperbarui!');
     }
 }

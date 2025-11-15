@@ -54,6 +54,11 @@ class Siswa extends Model
         'jumlah_saudara' => 'integer',
     ];
 
+    public function ekstrakurikulers()
+    {
+        return $this->belongsToMany(Ekstrakurikuler::class, 'ekstrakurikuler_siswa');
+    }
+
     // Siswa punya satu kelas
     public function kelas()
     {
