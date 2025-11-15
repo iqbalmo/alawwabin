@@ -5,7 +5,7 @@
                 {{-- 1. DASBOR --}}
                 <li>
                     <a href="{{ route('home') }}"
-                        class="{{ request()->routeIs('home') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                       class="{{ request()->routeIs('home') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                         <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -41,14 +41,14 @@
                     {{-- Sub-menu --}}
                     <ul x-show="open" x-transition class="mt-1 space-y-1">
                         <li>
-                            <a href="{{ route('siswa.index') }}"
+                            <a href="{{ route('siswa.index') }}" wire:navigate
                                 class="{{ request()->routeIs('siswa.index', 'siswa.create', 'siswa.edit', 'siswa.show') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
                                       block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
                                 Daftar Siswa Aktif
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('siswa.archive') }}"
+                            <a href="{{ route('siswa.archive') }}" wire:navigate
                                 class="{{ request()->routeIs('siswa.archive') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
                                       block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
                                 Arsip Lulusan
@@ -59,7 +59,7 @@
 
                 {{-- 3. DATA GURU --}}
                 <li>
-                    <a href="{{ route('guru.index') }}"
+                    <a href="{{ route('guru.index') }}" wire:navigate
                         class="{{ request()->routeIs('guru.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                         <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -89,33 +89,27 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </button>
-
-                    {{-- --- INI BARIS YANG DIPERBAIKI --- --}}
-                    {{-- Sub-menu (pl-11 dihapus dari sini) --}}
                     <ul x-show="open" x-transition class="mt-1 space-y-1">
                         <li>
-                            {{-- pl-11 dan bg-green-700 ditambahkan di sini --}}
-                            <a href="{{ route('kelas.index') }}"
+                            <a href="{{ route('kelas.index') }}" wire:navigate
                                 class="{{ request()->routeIs('kelas.index', 'kelas.create', 'kelas.edit', 'kelas.show') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
                                       block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
                                 Daftar Kelas
                             </a>
                         </li>
                         <li>
-                            {{-- pl-11 dan bg-green-700 ditambahkan di sini --}}
-                            <a href="{{ route('kelas.promotionTool') }}"
-                                class="{{ request()->routeIs('kelas.promotionTool') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
+                            <a href="{{ route('kelas.promotionTool') }}" wire:navigate
+                                class="{{ request()->routeIs('kelas.promotionTool', 'kelas.showPromotionForm') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
                                       block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
                                 Kenaikan Kelas
                             </a>
                         </li>
                     </ul>
-                    {{-- --------------------------------- --}}
                 </li>
 
                 {{-- 5. DATA MAPEL --}}
                 <li>
-                    <a href="{{ route('mapels.index') }}"
+                    <a href="{{ route('mapels.index') }}" wire:navigate
                         class="{{ request()->routeIs('mapels.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                         <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -127,7 +121,7 @@
                 </li>
                 {{-- 6. EKSKUL --}}
                 <li>
-                    <a href="{{ route('ekskul.index') }}"
+                    <a href="{{ route('ekskul.index') }}" wire:navigate
                         class="{{ request()->routeIs('ekskul.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                         <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -142,7 +136,7 @@
             <ul role="list" class="-mx-2 mt-0 space-y-1 ">
                 {{-- 7. DATA JADWAL --}}
                 <li>
-                    <a href="{{ route('jadwal.index') }}"
+                    <a href="{{ route('jadwal.index') }}" wire:navigate
                         class="{{ request()->routeIs('jadwal.*') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
                         <svg class="h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
