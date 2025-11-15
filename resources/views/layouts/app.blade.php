@@ -18,7 +18,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SITU Al-Awwabin')</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/alawwabin-logo.png') }}">
-    @vite('resources/css/app.css')
+    @livewireStyles
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     {{-- Alpine.js untuk dropdown & mobile menu --}}
     <script src="//unpkg.com/alpinejs" defer></script>
@@ -109,7 +110,7 @@
                             
                             @section('breadcrumbs')
                                 <li>
-                                    <span class="text-gray-900">Sistem Informasi Tata Usaha Al-Awwabin</span>
+                                    <span class="text-gray-900">Sistem Informasi Terpadu Al-Awwabin</span>
                                 </li>
                             @show
 
@@ -188,5 +189,6 @@
     </div>
 
     @stack('scripts')
+    @livewireScripts
 </body>
 </html>
