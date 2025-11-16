@@ -38,6 +38,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/ubah-password', [AuthController::class, 'showPasswordForm'])->name('password.edit');
     Route::post('/ubah-password', [AuthController::class, 'updatePassword'])->name('password.update');
 
+    Route::get('/siswa/import', [SiswaController::class, 'showImportForm'])->name('siswa.import');
+
     Route::get('/siswa/arsip', [SiswaController::class, 'archive'])->name('siswa.archive');
 
     // 🔹 CRUD Data Sekolah

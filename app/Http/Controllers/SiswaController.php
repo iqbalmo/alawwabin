@@ -187,4 +187,9 @@ class SiswaController extends Controller
         $siswa->delete();
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil dihapus.');
     }
+
+    public function showImportForm()
+    {
+        return view('siswa.import');
+    }
 }

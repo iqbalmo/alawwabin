@@ -54,6 +54,13 @@
                                 Arsip Lulusan
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('siswa.import') }}" wire:navigate
+                               class="{{ request()->routeIs('siswa.import') ? 'bg-green-700 text-white' : 'text-gray-400 hover:text-white hover:bg-green-700' }} 
+                                      block rounded-md py-2 pr-2 pl-11 text-sm leading-6">
+                                Import dari Excel
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
