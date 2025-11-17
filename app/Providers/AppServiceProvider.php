@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Guru;       
+use App\Observers\GuruObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         \Carbon\Carbon::setLocale('id');
+        Guru::observe(GuruObserver::class);
     }
     }
 
