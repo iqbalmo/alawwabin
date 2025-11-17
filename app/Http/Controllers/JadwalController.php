@@ -9,13 +9,14 @@ use App\Models\Guru;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule; // Import Rule
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth; // <-- 1. PASTIKAN Auth DI-IMPORT
 
 class JadwalController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request) // <-- Tambahkan (Request $request)
+    public function index(Request $request)
     {
         // Tentukan urutan hari yang benar
         $orderHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -23,18 +24,37 @@ class JadwalController extends Controller
         // Ambil tipe tampilan dari URL, default-nya adalah 'hari'
         $viewType = $request->query('view', 'hari');
 
+        // ==================================================================
+        // PERBAIKAN: Tambahkan filter RBAC di sini
+        // ==================================================================
+        
+        // 1. Ambil user yang sedang login
+        $user = Auth::user();
+
+        // 2. Buat query dasar untuk Jadwal
+        $jadwalQuery = Jadwal::query();
+
+        // 3. Terapkan filter RBAC
+        // Jika user BUKAN admin, filter jadwal hanya untuk guru_id mereka
+        if (!$user->hasRole('admin')) {
+            $jadwalQuery->where('guru_id', $user->guru_id);
+        }
+        
+        // ==================================================================
+
+
         if ($viewType == 'kelas') {
             // --- LOGIKA UNTUK TAMPILAN PER KELAS ---
             
-            // 1. Ambil semua kelas, urutkan berdasarkan tingkat
+            // 1. Ambil semua kelas (ini tidak perlu difilter, semua boleh lihat daftar kelas)
             $semuaKelas = Kelas::orderBy('tingkat', 'asc')
                                 ->orderBy('nama_kelas', 'asc')
                                 ->get();
             
-            // 2. Ambil semua jadwal
-            $allJadwals = Jadwal::with('mapel', 'guru')
-                                ->orderBy('jam_mulai', 'asc')
-                                ->get();
+            // 2. Ambil semua jadwal (GUNAKAN QUERY YANG SUDAH DIFILTER)
+            $allJadwals = $jadwalQuery->with('mapel', 'guru') // <-- 4. GUNAKAN $jadwalQuery
+                                     ->orderBy('jam_mulai', 'asc')
+                                     ->get();
             
             // 3. Kelompokkan jadwal berdasarkan kelas_id
             $groupedByKelas = $allJadwals->groupBy('kelas_id');
@@ -59,11 +79,12 @@ class JadwalController extends Controller
             ]);
 
         } else {
-            // --- LOGIKA UNTUK TAMPILAN PER HARI (YANG SUDAH ADA) ---
+            // --- LOGIKA UNTUK TAMPILAN PER HARI (DEFAULT) ---
             
-            $jadwals = Jadwal::with('kelas', 'mapel', 'guru')
-                            ->orderBy('jam_mulai', 'asc') 
-                            ->get();
+            // Ambil jadwal (GUNAKAN QUERY YANG SUDAH DIFILTER)
+            $jadwals = $jadwalQuery->with('kelas', 'mapel', 'guru') // <-- 4. GUNAKAN $jadwalQuery
+                                 ->orderBy('jam_mulai', 'asc') 
+                                 ->get();
 
             $groupedJadwals = $jadwals->groupBy('hari');
 
@@ -99,6 +120,7 @@ class JadwalController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi Anda sudah benar
         $request->validate([
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
             'jam_mulai' => 'required',
@@ -106,8 +128,7 @@ class JadwalController extends Controller
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_id' => 'required|exists:mapels,id',
             'guru_id' => 'required|exists:gurus,id',
-            // Validasi agar tidak ada jadwal bentrok (opsional tapi bagus)
-            'jam_mulai' => [
+            'jam_mulai' => [ // <-- 'jam_mulai' divalidasi dua kali, ini tidak masalah
                 'required',
                 Rule::unique('jadwals')->where(function ($query) use ($request) {
                     return $query->where('hari', $request->hari)
@@ -140,6 +161,7 @@ class JadwalController extends Controller
      */
     public function update(Request $request, Jadwal $jadwal)
     {
+        // Validasi Anda sudah benar
         $request->validate([
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
             'jam_mulai' => 'required',

@@ -17,10 +17,12 @@
             <div class="mt-4 sm:mt-0 sm:ml-16 flex flex-shrink-0 items-center space-x-3">
 
                 <!-- Tombol Edit Kelas (Primer) -->
+                @can('manage kelas')
                 <a href="{{ route('kelas.edit', $kelas->id) }}"
                     class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 focus:ring-offset-white">
                     Edit Kelas
                 </a>
+                @endcan
 
                 <!-- Tombol Urutkan Absen (Sekunder) -->
                 <!-- Form ini akan menjadi 'flex item' dan berbaris rapi -->

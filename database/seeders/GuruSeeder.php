@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Guru;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Schema; // Baris ini boleh dihapus, sudah tidak dipakai
 
 class GuruSeeder extends Seeder
 {
@@ -35,25 +35,23 @@ class GuruSeeder extends Seeder
             'name' => $guru->nama,
             'email' => 'guru@example.com',
             'password' => Hash::make('password'), // password: password
+            'guru_id' => $guru->id, // <-- Ini sudah benar, menghubungkan User ke Guru
         ];
 
-        // Jika ada kolom role, isi dengan 'guru'
-        if (Schema::hasColumn('users', 'role')) {
-            $userData['role'] = 'guru';
-        }
+        // -----------------------------------------------------------------
+        // HAPUS BLOK IF DI BAWAH INI (LOGIKA LAMA)
+        // -----------------------------------------------------------------
+        // if (Schema::hasColumn('users', 'role')) {
+        //     $userData['role'] = 'guru';
+        // }
 
-        // Jika ada kolom guru_id pada users, isi supaya relasi terhubung
-        if (Schema::hasColumn('users', 'guru_id')) {
-            $userData['guru_id'] = $guru->id;
-        }
-
+        // Buat User
         $user = User::create($userData);
 
-        // Jika users tidak punya guru_id tapi ingin relasi one-to-one dari Guru->user,
-        // Anda bisa set lewat relasi bila tabel mendukung (contoh safe-check):
-        // if (Schema::hasColumn('users', 'guru_id')) {
-        //     $user->guru_id = $guru->id;
-        //     $user->save();
-        // }
+        // -----------------------------------------------------------------
+        // TAMBAHKAN BARIS INI (LOGIKA BARU RBAC)
+        // -----------------------------------------------------------------
+        // Berikan peran 'guru' ke user yang baru dibuat
+        $user->assignRole('guru');
     }
 }

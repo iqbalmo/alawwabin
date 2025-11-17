@@ -30,8 +30,8 @@ class Jadwal extends Model
     }
 
     // Jadwal punya banyak rekap
-    public function rekaps()
+    public function agendas()
     {
-        return $this->hasMany(Rekap::class);
+        return $this->hasMany(Agenda::class);
     }
 }

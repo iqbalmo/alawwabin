@@ -52,6 +52,7 @@
     </div>
 
     {{-- 2. Form Tambah Siswa (DI-WIRE) --}}
+    @can('manage ekskul')
     <div class="mt-8">
         {{-- 
           PERUBAHAN: 
@@ -88,6 +89,7 @@
             </div>
         </form>
     </div>
+    @endcan
 
 
     {{-- 3. Wrapper Tabel Anggota Terdaftar (DI-WIRE) --}}

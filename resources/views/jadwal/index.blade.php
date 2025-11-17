@@ -12,12 +12,14 @@
             Lihat jadwal pelajaran mingguan berdasarkan hari atau berdasarkan kelas.
         </p>
     </div>
+    @can('manage jadwal')
     <div class="mt-4 sm:mt-0 sm:ml-16">
         <a href="{{ route('jadwal.create') }}" 
            class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 focus:ring-offset-white">
            + Tambah Jadwal
         </a>
     </div>
+    @endcan
 </div>
 
 {{-- 2. Tombol Filter (Tab) --}}
@@ -96,6 +98,7 @@
                                                 <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">
                                                     {{ $jadwal->guru?->nama ?? '-' }}
                                                 </td>
+                                                @can('manage jadwal')
                                                 <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                     <div class="flex items-center justify-end space-x-4">
                                                         <a href="{{ route('jadwal.edit', $jadwal->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">Edit</a>
@@ -106,6 +109,7 @@
                                                         </form>
                                                     </div>
                                                 </td>
+                                                @endcan
                                             </tr>
                                         @endforeach
                                     </tbody>

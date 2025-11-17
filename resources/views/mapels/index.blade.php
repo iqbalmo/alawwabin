@@ -12,12 +12,14 @@
             Daftar semua mata pelajaran yang tersedia di dalam sistem.
         </p>
     </div>
+    @can('manage mapel')
     <div class="mt-4 sm:mt-0 sm:ml-16">
         <a href="{{ route('mapels.create') }}" 
            class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 focus:ring-offset-white">
            + Tambah Mata Pelajaran
         </a>
     </div>
+    @endcan
 </div>
 
 {{-- 2. Wrapper Tabel untuk Responsivitas --}}
@@ -47,6 +49,7 @@
                                 <div class="font-bold text-[#333333]">{{ $mapel->nama_mapel }}</div>
                             </td>
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                @can('manage mapel')
                                 <div class="flex items-center justify-end space-x-4">
                                     <a href="{{ route('mapels.gurus', $mapel->id) }}" class="font-medium text-[#2C5F2D] hover:text-[#214621]">Lihat Guru</a>
                                     <a href="{{ route('mapels.edit', $mapel->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
@@ -60,6 +63,7 @@
                                         </button>
                                     </form>
                                 </div>
+                                @endcan
                             </td>
                         </tr>
                     @empty

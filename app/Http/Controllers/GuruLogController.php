@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\GuruLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Middleware\EnsureUserIsGuru;
+// use App\Http\Middleware\EnsureUserIsGuru; // <-- 1. DIHAPUS: Middleware lama tidak dipakai lagi
 
 class GuruLogController extends Controller
 {
     public function __construct()
     {
+        // 2. DIUBAH: Middleware 'auth' sudah cukup.
+        // Perlindungan 'permission:view gurulog' sudah ada di routes/web.php
+        //
+        // Menghapus middleware lama (EnsureUserIsGuru) akan memperbaiki error.
         $this->middleware('auth');
-        // pakai class middleware langsung (tidak perlu register di Kernel)
-        $this->middleware(EnsureUserIsGuru::class);
     }
 
     // Halaman form input rekap harian
@@ -61,11 +63,39 @@ class GuruLogController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $guruLogs = GuruLog::where('user_id', $user->id)
-            ->orderBy('tanggal', 'desc')
-            ->paginate(10);
 
-        return view('gurulog.index', compact('guruLogs'));
+        // 1. Ambil data log terakhir (untuk "Aktivitas Terakhir")
+        $queryLogs = GuruLog::query();
+        if (!$user->hasRole('admin')) {
+            $queryLogs->where('user_id', $user->id);
+        }
+        $guruLogs = $queryLogs->with('guru')
+                         ->orderBy('tanggal', 'desc')
+                         ->paginate(5); // Kita batasi 5 log terakhir di dashboard
+
+        // 2. Ambil data Jadwal Hari Ini untuk guru tersebut
+        $hariIni = now()->translatedFormat('l'); // 'l' akan menghasilkan 'Senin', 'Selasa', dst.
+        
+        $jadwalHariIni = \App\Models\Jadwal::where('guru_id', $user->guru_id)
+            ->where('hari', $hariIni)
+            ->with(['kelas', 'mapel'])
+            ->orderBy('jam_mulai', 'asc')
+            ->get();
+
+        // 3. Ambil data Event untuk Kalender (sama seperti di HomeController)
+        $events = \App\Models\Event::all()->map(function ($event) {
+            return [
+                'title' => $event->title,
+                'start' => $event->start_date,
+                'end' => $event->end_date,
+                'backgroundColor' => $event->color ?? '#3788d8',
+                'borderColor' => $event->color ?? '#3788d8',
+            ];
+        });
+        $eventsJson = json_encode($events);
+
+        // Kirim semua data ke view
+        return view('gurulog.index', compact('guruLogs', 'jadwalHariIni', 'eventsJson'));
     }
 
     // Edit rekap harian
@@ -73,9 +103,9 @@ class GuruLogController extends Controller
     {
         $guruLog = GuruLog::findOrFail($id);
 
-        // cek kepemilikan manual
-        if ($guruLog->user_id !== Auth::id()) {
-            abort(403);
+        // 4. DIPERBAIKI: Cek kepemilikan, TAPI izinkan Admin
+        if ($guruLog->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+            abort(403, 'Anda tidak diizinkan mengedit log ini.');
         }
 
         $user = Auth::user();
@@ -89,8 +119,9 @@ class GuruLogController extends Controller
     {
         $guruLog = GuruLog::findOrFail($id);
 
-        if ($guruLog->user_id !== Auth::id()) {
-            abort(403);
+        // 4. DIPERBAIKI: Cek kepemilikan, TAPI izinkan Admin
+        if ($guruLog->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+            abort(403, 'Anda tidak diizinkan memperbarui log ini.');
         }
 
         $validated = $request->validate([
@@ -112,8 +143,9 @@ class GuruLogController extends Controller
     {
         $guruLog = GuruLog::findOrFail($id);
 
-        if ($guruLog->user_id !== Auth::id()) {
-            abort(403);
+        // 4. DIPERBAIKI: Cek kepemilikan, TAPI izinkan Admin
+        if ($guruLog->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+            abort(403, 'Anda tidak diizinkan menghapus log ini.');
         }
 
         $guruLog->delete();

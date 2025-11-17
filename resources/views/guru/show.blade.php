@@ -5,7 +5,6 @@
 @section('content')
 <div class="bg-white shadow-md rounded-lg p-6 md:p-8">
 
-    <!-- Header Halaman -->
     <div class="sm:flex sm:items-center sm:justify-between">
         <div>
             <h2 class="text-2xl font-bold tracking-tight text-[#2C5F2D]">Detail Guru</h2>
@@ -14,10 +13,15 @@
             </p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16">
+            
+            {{-- RBAC: Hanya user dengan izin 'manage guru' yang bisa lihat tombol Edit --}}
+            @can('manage guru')
             <a href="{{ route('guru.edit', $guru->id) }}"
                class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 focus:ring-offset-white">
                 Edit Data Guru
             </a>
+            @endcan
+
             <a href="{{ route('guru.index') }}"
                class="ml-2 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                 Kembali ke Daftar
@@ -25,10 +29,8 @@
         </div>
     </div>
 
-    <!-- Wrapper Detail -->
     <div class="mt-10 space-y-12">
 
-        <!-- Data Pribadi -->
         <div class="border-b border-gray-900/10 pb-12">
             <h3 class="text-lg font-semibold leading-7 text-gray-900">1. Data Pribadi</h3>
             <dl class="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-6">
@@ -67,7 +69,6 @@
             </dl>
         </div>
 
-        <!-- Data Kepegawaian & Pendidikan -->
         <div class="pb-12">
             <h3 class="text-lg font-semibold leading-7 text-gray-900">2. Data Kepegawaian & Pendidikan</h3>
             <dl class="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-6">

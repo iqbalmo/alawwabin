@@ -12,9 +12,8 @@ use App\Http\Controllers\{
     MapelController,
     NilaiController,
     SiswaController,
-    RiwayatController,
-    RekapController,
-    EkskulController
+    EkskulController,
+    AgendaController,
 };
 
 // 🔹 Redirect root ke dashboard home
@@ -23,90 +22,121 @@ Route::redirect('/', '/home');
 // 🔹 Dashboard (hanya untuk user login)
 Route::get('/home', [HomeController::class, 'index'])
     ->name('home')
-    ->middleware('auth');
+    ->middleware('auth'); // Semua user yang login boleh lihat dashboard
 
-// 🔹 Autentikasi
+// 🔹 Autentikasi (Rute publik, tidak perlu auth)
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->name('login');
     Route::post('/login', 'login')->name('login.post');
-    Route::post('/logout', 'logout')->name('logout');
+    Route::post('/logout', 'logout')->name('logout')->middleware('auth'); // Logout harus user yg login
 });
 
 // 🔹 Semua route yang butuh login
 Route::middleware(['auth'])->group(function () {
 
+    // Ubah password boleh dilakukan semua user
     Route::get('/ubah-password', [AuthController::class, 'showPasswordForm'])->name('password.edit');
     Route::post('/ubah-password', [AuthController::class, 'updatePassword'])->name('password.update');
 
-    Route::get('/siswa/import', [SiswaController::class, 'showImportForm'])->name('siswa.import');
-
-    Route::get('/siswa/arsip', [SiswaController::class, 'archive'])->name('siswa.archive');
-
-    // 🔹 CRUD Data Sekolah
-    Route::resource('siswa', SiswaController::class);
-    Route::resource('guru', GuruController::class);
-    Route::resource('kelas', KelasController::class)->parameter('kelas', 'kelas');
-    Route::resource('mapels', MapelController::class);
-    Route::resource('nilais', NilaiController::class);
-    Route::resource('jadwal', JadwalController::class);
-    Route::resource('ekskul', EkskulController::class);
-    
-    // --- TAMBAHKAN DUA RUTE INI ---
-    Route::post('/ekskul/{ekskul}/attach', [EkskulController::class, 'attachSiswa'])->name('ekskul.attachSiswa');
-    Route::post('/ekskul/{ekskul}/detach/{siswa}', [EkskulController::class, 'detachSiswa'])->name('ekskul.detachSiswa');
-
-    Route::post('/kelas/{kelas}/reorder-absen', [KelasController::class, 'reorderAbsen'])->name('kelas.reorderAbsen');
-
-    Route::get('/manajemen-kelas/kenaikan-kelas', [KelasController::class, 'showPromotionTool'])->name('kelas.promotionTool');
-    
-    // RUTE BARU (untuk menampilkan halaman checkbox per kelas)
-    Route::get('/manajemen-kelas/promosi/{kelas}', [KelasController::class, 'showClassPromotionForm'])->name('kelas.showPromotionForm');
-    
-    // Rute LAMA (dulu 'processPromotion', sekarang kita ganti nama agar lebih jelas)
-    // Ini adalah tujuan form checkbox
-    Route::post('/manajemen-kelas/promosi/proses', [KelasController::class, 'processClassPromotion'])->name('kelas.processPromotion');
-
-    // 🔹 Relasi Mapel -> Guru
-    Route::get('/mapel/{mapel}/guru', [MapelController::class, 'showGurus'])
-        ->name('mapels.gurus');
-
-    // 🔹 Event untuk kalender
-    Route::resource('events', EventController::class)
-        ->only(['index', 'create', 'store', 'destroy']);
-
-    // 🔹 GuruLog
-    Route::prefix('gurulog')->name('gurulog.')->controller(GuruLogController::class)->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/create', 'create')->name('create');
-        Route::post('/', 'store')->name('store');
-        Route::get('/{id}/edit', 'edit')->name('edit');
-        Route::put('/{id}', 'update')->name('update');
-        Route::delete('/{id}', 'destroy')->name('destroy');
+    // -----------------------------------------------------------------
+    // 🔹 MANAJEMEN SISWA (Admin & Wali Kelas)
+    // -----------------------------------------------------------------
+    Route::middleware(['permission:manage siswa'])->group(function () {
+        Route::get('/siswa/import', [SiswaController::class, 'showImportForm'])->name('siswa.import');
+        Route::get('/siswa/arsip', [SiswaController::class, 'archive'])->name('siswa.archive');
+        Route::resource('siswa', SiswaController::class);
     });
 
-    // 🔹 Riwayat
-    // Riwayat
-    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
-    Route::get('/riwayat/{id}', [RiwayatController::class, 'show'])->name('riwayat.show');
+    // -----------------------------------------------------------------
+    // 🔹 MANAJEMEN GURU (Hanya Admin)
+    // -----------------------------------------------------------------
+    Route::resource('guru', GuruController::class)
+         ->middleware('permission:manage guru');
 
+    // -----------------------------------------------------------------
+    // 🔹 MANAJEMEN KELAS (Hanya Admin)
+    // -----------------------------------------------------------------
+    Route::middleware(['permission:manage kelas'])->group(function () {
+        Route::resource('kelas', KelasController::class)->parameter('kelas', 'kelas');
+        Route::post('/kelas/{kelas}/reorder-absen', [KelasController::class, 'reorderAbsen'])->name('kelas.reorderAbsen');
+        Route::get('/manajemen-kelas/kenaikan-kelas', [KelasController::class, 'showPromotionTool'])->name('kelas.promotionTool');
+        Route::get('/manajemen-kelas/promosi/{kelas}', [KelasController::class, 'showClassPromotionForm'])->name('kelas.showPromotionForm');
+        Route::post('/manajemen-kelas/promosi/proses', [KelasController::class, 'processClassPromotion'])->name('kelas.processPromotion');
+    });
 
-    // 🔹 Rekap Absensi
-    // 🔹 Rekap Absensi
-Route::prefix('rekap')->name('rekap.')->group(function () {
-    Route::get('/', [RekapController::class, 'index'])->name('index'); // List semua rekap
-    Route::get('/create', [RekapController::class, 'create'])->name('create'); // Form tambah rekap
-    Route::post('/', [RekapController::class, 'store'])->name('store'); // Simpan rekap
-    Route::get('/get-siswa-by-jadwal/{id}', [RekapController::class, 'getSiswaByJadwal']); // AJAX
-    Route::get('/{id}/edit', [RekapController::class, 'edit'])->name('edit'); // Edit rekap
-    Route::put('/{id}', [RekapController::class, 'update'])->name('update'); // Update rekap
-    Route::delete('/{id}', [RekapController::class, 'destroy'])->name('destroy'); // Hapus rekap
-});
+    // -----------------------------------------------------------------
+    // 🔹 MANAJEMEN AKADEMIK
+    // -----------------------------------------------------------------
+    
+    // Mapel (Admin)
+    Route::resource('mapels', MapelController::class)
+         ->middleware('permission:manage mapel');
+    Route::get('/mapel/{mapel}/guru', [MapelController::class, 'showGurus'])
+         ->name('mapels.gurus')
+         ->middleware('permission:manage mapel');
 
+    // Nilai (Admin, Wali, Guru)
+    Route::resource('nilais', NilaiController::class)
+         ->middleware('permission:manage nilai');
 
-    // 🔹 API sederhana (optional, bisa hapus kalau sudah ada AJAX)
+    // Jadwal (Split: Admin bisa manage, Guru/Wali bisa view)
+    Route::resource('jadwal', JadwalController::class)
+         ->except(['index', 'show']) // Admin C-U-D
+         ->middleware('permission:manage jadwal');
+    Route::resource('jadwal', JadwalController::class)
+         ->only(['index', 'show']) // Admin, Wali, Guru R (Read)
+         ->middleware('permission:view jadwal'); // Pastikan Admin juga punya izin 'view jadwal'
+
+    // Ekskul (Admin)
+    Route::middleware(['permission:manage ekskul'])->group(function () {
+        Route::resource('ekskul', EkskulController::class);
+        Route::post('/ekskul/{ekskul}/attach', [EkskulController::class, 'attachSiswa'])->name('ekskul.attachSiswa');
+        Route::post('/ekskul/{ekskul}/detach/{siswa}', [EkskulController::class, 'detachSiswa'])->name('ekskul.detachSiswa');
+    });
+
+    // Event Kalender (Hanya Admin, kita pakai role karena tidak ada permission spesifik)
+    Route::resource('events', EventController::class)
+         ->only(['index', 'create', 'store', 'destroy'])
+         ->middleware('role:admin'); // Asumsi hanya admin yg boleh kelola event
+
+    // -----------------------------------------------------------------
+    // 🔹 LOG & RIWAYAT
+    // -----------------------------------------------------------------
+    
+    // GuruLog (Admin, Wali, Guru)
+    Route::prefix('gurulog')->name('gurulog.')
+         ->controller(GuruLogController::class)
+         ->middleware('permission:view gurulog') // Semua user login bisa lihat
+         ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::put('/{id}', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+    });
+
+    Route::prefix('agenda')->name('agenda.')->controller(AgendaController::class)->group(function () {
+        Route::get('/', 'index')->name('index'); // Dashboard progres agenda
+        Route::get('/create', 'create')->name('create'); // Form isi agenda
+        Route::post('/', 'store')->name('store'); // Simpan agenda
+        Route::get('/{jadwal_id}/show', 'show')->name('show'); // Riwayat per jadwal
+        Route::get('/{agenda}/edit', 'edit')->name('edit'); // Edit 1 entri agenda
+        Route::put('/{agenda}', 'update')->name('update'); // Update 1 entri agenda
+        Route::delete('/{agenda}', 'destroy')->name('destroy'); // Hapus 1 entri agenda
+        
+        // Rute AJAX
+        Route::get('/get-siswa-by-jadwal/{id}', 'getSiswaByJadwal')->name('getSiswa');
+    });
+
+    // -----------------------------------------------------------------
+    // 🔹 ABSENSI & API
+    // -----------------------------------------------------------------
+
+    // API Sederhana (Harus dilindungi juga, sama seperti yg menggunakannya)
     Route::get('/api/siswa-by-jadwal/{id}', function($id) {
         $jadwal = App\Models\Jadwal::findOrFail($id);
         $siswas = App\Models\Siswa::where('kelas_id', $jadwal->kelas_id)->get();
         return response()->json($siswas);
-    });
+    })->middleware('permission:manage absensi');
 });

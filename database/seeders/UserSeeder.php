@@ -14,21 +14,18 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Hapus factory default jika ada
-        // \App\Models\User::factory(10)->create();
-
         // Buat satu user admin yang spesifik
-        User::create([
+        $adminUser = User::create([
             'name' => 'Admin Al-Awwabin',
             'email' => 'admin@alawwabin.com',
-            'password' => Hash::make('password'), // Ganti 'password' dengan password aman Anda jika mau
+            'password' => Hash::make('password'), // Ganti 'password' dengan password aman Anda
         ]);
 
-        // Anda bisa tambahkan user lain di sini jika perlu
-        // User::create([
-        //     'name' => 'User Biasa',
-        //     'email' => 'user@alawwabin.com',
-        //     'password' => Hash::make('password'),
-        // ]);
+        // -----------------------------------------------------------------
+        // TAMBAHKAN BARIS INI
+        // -----------------------------------------------------------------
+        // Berikan peran 'admin' ke user yang baru dibuat.
+        // Ini e-require 'RolesAndPermissionsSeeder' sudah dijalankan LEBIH DULU.
+        $adminUser->assignRole('admin');
     }
 }

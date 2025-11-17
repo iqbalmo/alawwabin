@@ -18,6 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SITU Al-Awwabin')</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/alawwabin-logo.png') }}">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -29,6 +30,21 @@
 </head>
 
 <body class="h-full">
+    {{-- Loading Bar: Muncul saat Livewire sedang memproses request --}}
+    <div wire:loading.delay.longest
+        class="fixed top-0 left-0 right-0 h-1 bg-green-500 z-[10001]"
+        style="background-image: linear-gradient(to right, #C8963E, #2C5F2D); animation: indeterminateAnimation 1s infinite linear;">
+        <style>
+            @keyframes indeterminateAnimation { 0% { transform: translateX(-100%) scaleX(0.5); } 100% { transform: translateX(100%) scaleX(0.5); } }
+            .livewire-progress { animation: indeterminateAnimation 1s infinite linear; }
+        </style>
+    </div>
+    
+    {{-- Offline Indicator: Muncul saat koneksi terputus --}}
+    <div wire:offline class="fixed top-0 left-0 right-0 p-2 text-center bg-red-600 text-white z-[10000]">
+        Anda sedang offline. Koneksi terputus.
+    </div>
+
     <div x-data="{ sidebarOpen: false }" class="relative h-full">
         
         {{-- 1. Mobile Sidebar --}}
@@ -57,18 +73,22 @@
                         </button>
                     </div>
 
-                    {{-- [PERUBAHAN]: Sidebar Mobile menyesuaikan role --}}
+                    {{-- [PERUBAHAN 1]: Sidebar Mobile --}}
                     <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#2C5F2D] px-6 pb-4">
                         <div class="flex h-16 shrink-0 items-center">
                             <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SITU Al-Awwabin">
                             <span class="ml-3 text-white font-semibold">SITU Al-Awwabin</span>
                         </div>
 
-                        @if(Auth::check() && Auth::user()->role === 'guru')
-                            @include('layouts.partials.navigationGuru')
-                        @else
+                        {{-- ================================================================== --}}
+                        {{-- PERBAIKAN DIMULAI DI SINI (BLOK LOGIKA 1) --}}
+                        {{-- Logika @if/@elseif dihapus, semua user memuat 'navigation' --}}
+                        {{-- ================================================================== --}}
+                        @auth
                             @include('layouts.partials.navigation')
-                        @endif
+                        @endauth
+                        {{-- ================================================================== --}}
+
                     </div>
                 </div>
             </div>
@@ -82,12 +102,15 @@
                     <span class="ml-3 text-white font-semibold">SITU Al-Awwabin</span>
                 </div>
 
-                {{-- [PERUBAHAN]: Sidebar Desktop menyesuaikan role --}}
-                @if(Auth::check() && Auth::user()->role === 'guru')
-                    @include('layouts.partials.navigationGuru')
-                @else
+                {{-- [PERUBAHAN 2]: Sidebar Desktop --}}
+                {{-- ================================================================== --}}
+                {{-- PERBAIKAN DIMULAI DI SINI (BLOK LOGIKA 2) --}}
+                {{-- ================================================================== --}}
+                @auth
                     @include('layouts.partials.navigation')
-                @endif
+                @endauth
+                {{-- ================================================================== --}}
+                
             </div>
         </div>
 
@@ -129,6 +152,7 @@
                     </button>
 
                     {{-- Dropdown User --}}
+                    @auth {{-- Pastikan user login sebelum menampilkan ini --}}
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open" class="-m-1.5 flex items-center p-1.5">
                             <img class="h-8 w-8 rounded-full bg-gray-50"
@@ -150,8 +174,8 @@
                              class="absolute right-0 z-10 mt-2.5 w-48 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
                              x-cloak>
                             <a href="{{ route('password.edit') }}" class="block px-3 py-1 text-sm leading-6 text-gray-900 hover:bg-gray-50">
-                                    Ubah Password
-                                </a>
+                                 Ubah Password
+                             </a>
                             <a href="{{ route('logout') }}"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                class="block px-3 py-1 text-sm leading-6 text-gray-900 hover:bg-gray-50">
@@ -162,12 +186,29 @@
                             </form>
                         </div>
                     </div>
+                    @endauth
                 </div>
             </div>
 
             {{-- 4. Konten Halaman --}}
             <main class="py-10 flex-grow">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {{-- Notifikasi Sukses --}}
+                    @if(session('success'))
+                        <div class="rounded-md bg-green-50 p-4 mb-6 border border-green-200">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="rounded-lg bg-white px-5 py-6 shadow sm:px-6">
                         <div class="rounded-lg border border-gray-200 p-6"
                              style="background-image: repeating-linear-gradient(-45deg, hsla(121, 39%, 27%, 0.03), hsla(121, 39%, 27%, 0.03) 1px, transparent 1px, transparent 8px );">
@@ -182,7 +223,7 @@
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <p class="text-center text-sm leading-5 text-gray-500">
                         &copy; {{ date('Y') }} SITU Al-Awwabin. Hak Cipta Dilindungi.
-                    </p>
+                    </D>
                 </div>
             </footer>
         </div>

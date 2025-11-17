@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User; // <-- Tambahkan ini
+use App\Models\User; // <-- Ini sudah benar
 
 class AuthController extends Controller
 {
@@ -21,25 +21,28 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        // 🚨 DIPERBAIKI: Menambahkan logika untuk checkbox "Ingat Saya"
+        // Menambahkan logika untuk checkbox "Ingat Saya"
         $remember = $request->boolean('remember-me');
 
         if (Auth::attempt($credentials, $remember)) {
-            // 🚨 DIPERBAIKI: Regenerasi session untuk keamanan (mencegah session fixation)
+            // Regenerasi session untuk keamanan (mencegah session fixation)
             $request->session()->regenerate();
             
-            // 🚨 DIPERBAIKI: Redirect sesuai role user
+            // Redirect sesuai role user
             $user = Auth::user();
             
-            if ($user->role === 'guru') {
+            // Gunakan hasRole() dari Spatie
+            if ($user->hasRole('guru') && !$user->hasRole('admin')) {
                 return redirect()->route('gurulog.index')->with('success', 'Berhasil login sebagai Guru');
             }
             
-            // Default redirect ke home untuk role lainnya
+            // Admin & Wali Kelas akan redirect ke home
             return redirect()->intended(route('home'))->with('success', 'Berhasil login');
-        }
 
-        // 🚨 DIPERBAIKI: Kembali dengan pesan error DAN mengisi kembali input email
+        // Kurung kurawal '}' yang hilang untuk blok 'if' ada di sini
+        } 
+
+        // Kembali dengan pesan error DAN mengisi kembali input email
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');

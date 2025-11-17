@@ -13,12 +13,14 @@
             Kelola semua kegiatan ekstrakurikuler di sekolah.
         </p>
     </div>
+    @can('manage ekskul')
     <div class="mt-4 sm:mt-0 sm:ml-16">
         <a href="{{ route('ekskul.create') }}" 
            class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2">
            + Tambah Ekskul Baru
         </a>
     </div>
+    @endcan
 </div>
 
 {{-- 2. Wrapper Tabel --}}
@@ -47,6 +49,7 @@
                             <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">
                                 {{ $ekskul->pembina?->nama ?? '-' }}
                             </td>
+                            @can('manage ekskul')
                             <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                 <div class="flex items-center justify-end space-x-4">
                                     
@@ -68,6 +71,7 @@
                                     </form>
                                 </div>
                             </td>
+                            @endcan
                         </tr>
                     @empty
                         <tr>

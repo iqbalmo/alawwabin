@@ -13,12 +13,15 @@
                 Daftar semua siswa aktif yang terdaftar di dalam sistem.
             </p>
         </div>
+        {{-- RBAC: Tombol "Tambah Siswa" sudah benar dilindungi --}}
+        @can('manage siswa')
         <div class="mt-4 sm:mt-0 sm:ml-16">
             <a href="{{ route('siswa.create') }}" 
                class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 focus:ring-offset-white">
-               + Tambah Siswa
+                + Tambah Siswa
             </a>
         </div>
+        @endcan
     </div>
 
     {{-- 2. Form Pencarian (Dihubungkan ke Livewire) --}}
@@ -115,22 +118,31 @@
                                     @endif
                                 </td>
                                 <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                    
+                                    {{-- KODE PERBAIKAN DIMULAI DI SINI --}}
                                     <div class="flex items-center justify-end space-x-4">
+                                        {{-- Tombol Detail boleh dilihat oleh siapa saja (asumsi 'view siswa' dimiliki semua role) --}}
                                         <a href="{{ route('siswa.show', $s->id) }}" class="text-blue-600 hover:text-blue-800">
                                             Detail
                                         </a>
-                                        <a href="{{ route('siswa.edit', $s->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
-                                            Edit
-                                        </a>
-                                        
-                                        {{-- Ganti <form> dengan <button wire:click> --}}
-                                        <button type="button" 
-                                                wire:click="deleteSiswa({{ $s->id }})"
-                                                wire:confirm="Yakin ingin menghapus siswa ini? Seluruh data terkait (nilai, dll) akan ikut terhapus."
-                                                class="text-red-600 hover:text-red-800">
-                                            Hapus
-                                        </button>
+
+                                        {{-- Hanya user dengan izin 'manage siswa' yang bisa lihat Edit dan Hapus --}}
+                                        @can('manage siswa')
+                                            <a href="{{ route('siswa.edit', $s->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
+                                                Edit
+                                            </a>
+                                            
+                                            {{-- Ganti <form> dengan <button wire:click> --}}
+                                            <button type="button" 
+                                                    wire:click="deleteSiswa({{ $s->id }})"
+                                                    wire:confirm="Yakin ingin menghapus siswa ini? Seluruh data terkait (nilai, dll) akan ikut terhapus."
+                                                    class="text-red-600 hover:text-red-800">
+                                                Hapus
+                                            </button>
+                                        @endcan
                                     </div>
+                                    {{-- KODE PERBAIKAN SELESAI DI SINI --}}
+
                                 </td>
                             </tr>
                         @empty
