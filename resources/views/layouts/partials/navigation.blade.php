@@ -1,5 +1,5 @@
 <nav class="flex flex-1 flex-col">
-    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+    <ul role="list" class="flex flex-1 flex-col gap-y-3">
         <li>
             <ul role="list" class="-mx-2 space-y-1">
                 {{-- 1. DASBOR --}}
@@ -198,7 +198,7 @@
 
         <li>
             @canany(['view jadwal', 'manage absensi', 'manage nilai'])
-                <div class="text-xs font-bold leading-6 text-[#C8963E] tracking-wider uppercase mb-2 mt-4">Data Akademik</div>
+                <div class="text-xs font-bold leading-6 text-[#C8963E] tracking-wider uppercase mb-2">Data Akademik</div>
             @endcanany
 
             <ul role="list" class="-mx-2 space-y-1">

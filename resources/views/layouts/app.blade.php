@@ -81,7 +81,7 @@
                     <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#2C5F2D] px-6 pb-4">
                         <div class="flex h-16 shrink-0 items-center gap-3">
                             <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SITU Al-Awwabin">
-                            <span class="text-white font-semibold text-lg">SITU Al-Awwabin</span>
+                            <span class="text-white font-semibold text-sm">SITU Al-Awwabin</span>
                         </div>
 
                         @auth
@@ -97,7 +97,7 @@
             <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#2C5F2D] px-6 pb-4 shadow-xl">
                 <div class="flex h-16 shrink-0 items-center gap-3">
                     <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SITU Al-Awwabin">
-                    <span class="text-white font-semibold text-lg">SITU Al-Awwabin</span>
+                    <span class="text-white font-semibold text-sm">SITU Al-Awwabin</span>
                 </div>
 
                 @auth
