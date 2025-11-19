@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Ekstrakurikuler;
 use App\Models\Siswa;
 use Illuminate\Validation\Rule;
+use App\Models\Kelas;
 
 class ManageEkskulMembers extends Component
 {
@@ -13,6 +14,9 @@ class ManageEkskulMembers extends Component
 
     // Ini akan terhubung (bound) ke dropdown <select>
     public $siswa_id_to_add = '';
+    
+    // Filter Kelas
+    public $selectedKelasId = '';
 
     /**
      * Mount (pasang) model Ekskul saat komponen dimuat.
@@ -45,7 +49,7 @@ class ManageEkskulMembers extends Component
         // 'attach' adalah perintah untuk relasi Many-to-Many
         $this->ekskul->siswas()->attach($this->siswa_id_to_add);
         
-        // Reset dropdown
+        // Reset dropdown siswa, tapi biarkan filter kelas
         $this->reset('siswa_id_to_add');
         
         // Kirim pesan sukses
@@ -75,21 +79,29 @@ class ManageEkskulMembers extends Component
             $query->orderBy('nama', 'asc');
         }]);
 
-        // 2. Ambil ID siswa yang SUDAH terdaftar di ekskul ini
-        $siswaTerdaftarIds = $this->ekskul->siswas->pluck('id');
+        // 2. Ambil daftar semua kelas untuk dropdown filter
+        $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
         // 3. Ambil daftar siswa (hanya yang aktif) yang BELUM terdaftar
-        //    (Ini adalah query yang sudah kita perbaiki sebelumnya)
-        $siswaTersedia = Siswa::where(function ($query) {
-                                $query->where('status_mukim', '!=', 'Lulus')
-                                      ->orWhereNull('status_mukim');
-                            })
-                            ->whereNotIn('id', $siswaTerdaftarIds)
-                            ->orderBy('nama', 'asc')
-                            ->get();
+        //    DAN sesuai dengan filter kelas yang dipilih
+        $siswaTersedia = [];
+        
+        if ($this->selectedKelasId) {
+            $siswaTerdaftarIds = $this->ekskul->siswas->pluck('id');
+            
+            $siswaTersedia = Siswa::where('kelas_id', $this->selectedKelasId)
+                                ->where(function ($query) {
+                                    $query->where('status_mukim', '!=', 'Lulus')
+                                          ->orWhereNull('status_mukim');
+                                })
+                                ->whereNotIn('id', $siswaTerdaftarIds)
+                                ->orderBy('nama', 'asc')
+                                ->get();
+        }
 
         // 4. Kirim data ke view Livewire
         return view('livewire.manage-ekskul-members', [
+            'kelasList' => $kelasList,
             'siswaTersedia' => $siswaTersedia
         ]);
     }

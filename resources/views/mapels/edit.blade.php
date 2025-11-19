@@ -1,67 +1,42 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Mata Pelajaran | SITU Al-Awwabin') {{-- Judul Tab Browser --}}
+@section('title', 'Edit Mata Pelajaran | SITU Al-Awwabin')
 
 @section('content')
-{{-- Wrapper 'bg-slate-800' dihapus agar konsisten --}}
-<div class="max-w-2xl mx-auto"> 
-    
-    <!-- Judul diubah ke Hijau Utama -->
-    <h2 class="text-2xl font-bold text-[#2C5F2D] mb-6">Edit Mata Pelajaran</h2>
-
-    {{-- Blok Error Validasi (disesuaikan untuk tema terang) --}}
-    @if ($errors->any())
-        <div class="mb-6 rounded-md bg-red-500/20 p-4 border border-red-500/30">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <!-- Teks diubah ke warna merah gelap -->
-                    <h3 class="text-sm font-medium text-red-700">Terdapat {{ $errors->count() }} error pada input Anda:</h3>
-                    <div class="mt-2 text-sm text-red-700">
-                        <ul role="list" class="list-disc list-inside space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-[#2C5F2D]">Edit Mata Pelajaran</h1>
+        <p class="mt-1 text-sm text-gray-600">Perbarui informasi mata pelajaran.</p>
+    </div>
 
     <form action="{{ route('mapels.update', $mapel->id) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
 
-        {{-- Grup Form: Nama Mata Pelajaran --}}
-        <div>
-            <!-- Label diubah ke teks abu-abu gelap -->
-            <label for="nama_mapel" class="block text-sm font-medium text-gray-700 mb-1">
-                Nama Mata Pelajaran
-            </label>
-            <!-- Input diubah ke style light mode, fokus Aksen Emas -->
-            <input type="text" name="nama_mapel" id="nama_mapel" 
-                   class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm" 
-                   value="{{ old('nama_mapel', $mapel->nama_mapel) }}" required>
+        <div class="bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
+            <div class="bg-[#F0E6D2] px-6 py-4 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-[#2C5F2D]">Informasi Mapel</h3>
+            </div>
+            
+            <div class="p-6">
+                <label for="nama_mapel" class="block text-sm font-medium leading-6 text-gray-900">Nama Mata Pelajaran <span class="text-red-600">*</span></label>
+                <div class="mt-2">
+                    <input type="text" name="nama_mapel" id="nama_mapel" value="{{ old('nama_mapel', $mapel->nama_mapel) }}" placeholder="Contoh: Matematika" required
+                           class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
+                    @error('nama_mapel') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
         </div>
 
         {{-- Tombol Aksi --}}
-        <div class="flex items-center space-x-4 pt-4">
-            {{-- Tombol Update (Primary) diubah ke Aksen Emas --}}
-            <button type="submit"
-                    class="bg-[#C8963E] hover:bg-[#b58937] text-[#333333] font-medium py-2 px-4 rounded-md shadow-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2">
-                Update
-            </button>
-            
-            {{-- Tombol Batal (Secondary) diubah ke style outline terang --}}
-            <a href="{{ route('mapels.index') }}" 
-               class="bg-transparent hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-md border border-gray-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2">
-               Batal
+        <div class="flex items-center justify-end gap-x-4">
+            <a href="{{ route('mapels.index') }}" class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700">
+                Batal
             </a>
+            <button type="submit"
+                    class="rounded-lg bg-[#2C5F2D] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#214621] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all">
+                Update Mapel
+            </button>
         </div>
     </form>
 </div>

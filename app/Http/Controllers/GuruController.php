@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use App\Models\Mapel;
+use App\Http\Requests\StoreGuruRequest;
+use App\Http\Requests\UpdateGuruRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -22,25 +24,9 @@ class GuruController extends Controller
         return view('guru.create', compact('mapels'));
     }
 
-    public function store(Request $request)
+    public function store(StoreGuruRequest $request)
     {
-        $validatedData = $request->validate([
-            'nama' => 'required|string|max:255',
-            'gelar' => 'nullable|string|max:100',
-            'nip' => 'nullable|string|max:100|unique:gurus,nip',
-            'tempat_lahir' => 'nullable|string|max:100',
-            'tanggal_lahir' => 'nullable|date',
-            'jenis_kelamin' => 'nullable|in:L,P',
-            'pend_terakhir_tahun' => 'nullable|string:4',
-            'pend_terakhir_univ' => 'nullable|string|max:255',
-            'pend_terakhir_jurusan' => 'nullable|string|max:255',
-            'tahun_mulai_bekerja' => 'nullable|string:4',
-            'jabatan' => 'nullable|string|max:100',
-            'status_kepegawaian' => 'nullable|in:PNS,Swasta',
-            'mapel_id' => 'nullable|exists:mapels,id',
-            'alamat' => 'nullable|string',
-            'telepon' => 'nullable|string|max:20',
-        ]);
+        $validatedData = $request->validated();
 
         Guru::create($validatedData);
 
@@ -67,30 +53,9 @@ class GuruController extends Controller
         return view('guru.edit', compact('guru', 'mapels'));
     }
 
-    public function update(Request $request, Guru $guru)
+    public function update(UpdateGuruRequest $request, Guru $guru)
     {
-        $validatedData = $request->validate([
-            'nama' => 'required|string|max:255',
-            'gelar' => 'nullable|string|max:100',
-            'nip' => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('gurus')->ignore($guru->id),
-            ],
-            'tempat_lahir' => 'nullable|string|max:100',
-            'tanggal_lahir' => 'nullable|date',
-            'jenis_kelamin' => 'nullable|in:L,P',
-            'pend_terakhir_tahun' => 'nullable|string:4',
-            'pend_terakhir_univ' => 'nullable|string|max:255',
-            'pend_terakhir_jurusan' => 'nullable|string|max:255',
-            'tahun_mulai_bekerja' => 'nullable|string:4',
-            'jabatan' => 'nullable|string|max:100',
-            'status_kepegawaian' => 'nullable|in:PNS,Swasta',
-            'mapel_id' => 'nullable|exists:mapels,id',
-            'alamat' => 'nullable|string',
-            'telepon' => 'nullable|string|max:20',
-        ]);
+        $validatedData = $request->validated();
 
         $guru->update($validatedData);
 

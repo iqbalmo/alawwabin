@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Kelas;
 use App\Models\Guru;
 use App\Models\Siswa;
+use App\Http\Requests\StoreKelasRequest;
+use App\Http\Requests\UpdateKelasRequest;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class KelasController extends Controller
@@ -43,25 +44,9 @@ class KelasController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreKelasRequest $request)
     {
-        $request->validate([
-            'tingkat' => 'required|string|max:20',
-            'nama_kelas' => [
-                'required',
-                'string',
-                'max:255',
-                // Aturan ini memeriksa: "nama_kelas" harus unik di tabel 'kelas'
-                // DIMANA "tingkat"-nya sama dengan yang diinput.
-                Rule::unique('kelas')->where(function ($query) use ($request) {
-                    return $query->where('tingkat', $request->tingkat);
-                }),
-            ],
-            'wali_kelas_id' => 'nullable|exists:gurus,id'
-        ], [
-            // Pesan error kustom agar lebih jelas
-            'nama_kelas.unique' => 'Kombinasi Tingkat dan Nama Kelas ini sudah ada.'
-        ]);
+        // Validasi sudah ditangani oleh StoreKelasRequest
 
         Kelas::create([
             'nama_kelas' => $request->nama_kelas,
@@ -111,23 +96,9 @@ class KelasController extends Controller
      * Update the specified resource in storage.
      */
     // Parameter (Kelas $kelas) sudah benar (perbaikan dari Anda)
-    public function update(Request $request, Kelas $kelas) 
+    public function update(UpdateKelasRequest $request, Kelas $kelas)
     {
-        $request->validate([
-            'tingkat' => 'required|string|max:20',
-            'nama_kelas' => [
-                'required',
-                'string',
-                'max:255',
-                // Aturan yang sama, tapi 'ignore' (abaikan) ID kelas saat ini
-                Rule::unique('kelas')->where(function ($query) use ($request) {
-                    return $query->where('tingkat', $request->tingkat);
-                })->ignore($kelas->id), // $kela->id adalah ID kelas yg sedang diedit
-            ],
-            'wali_kelas_id' => 'nullable|exists:gurus,id'
-        ], [
-            'nama_kelas.unique' => 'Kombinasi Tingkat dan Nama Kelas ini sudah ada.'
-        ]);
+        // Validasi sudah ditangani oleh UpdateKelasRequest
 
         $kelas->update([
             'nama_kelas' => $request->nama_kelas,

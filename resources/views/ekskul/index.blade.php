@@ -1,82 +1,113 @@
 @extends('layouts.app')
 
 @section('title', 'Daftar Ekstrakurikuler | SITU Al-Awwabin')
-@section('header-title', 'Ekstrakurikuler')
 
 @section('content')
 
-{{-- 1. Header Halaman --}}
-<div class="sm:flex sm:items-center sm:justify-between">
-    <div>
-        <h2 class="text-2xl font-bold tracking-tight text-[#2C5F2D]">Daftar Ekstrakurikuler</h2>
-        <p class="mt-2 text-sm text-gray-600">
-            Kelola semua kegiatan ekstrakurikuler di sekolah.
-        </p>
+    {{-- Header Halaman --}}
+    <div class="sm:flex sm:items-center sm:justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-[#2C5F2D]">Daftar Ekstrakurikuler</h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Kelola semua kegiatan ekstrakurikuler di sekolah.
+            </p>
+        </div>
+        @can('manage ekskul')
+        <div class="mt-4 sm:mt-0 sm:ml-16">
+            <a href="{{ route('ekskul.create') }}" 
+               class="inline-flex items-center justify-center rounded-lg bg-[#C8963E] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 transition-all">
+               + Tambah Ekskul
+            </a>
+        </div>
+        @endcan
     </div>
-    @can('manage ekskul')
-    <div class="mt-4 sm:mt-0 sm:ml-16">
-        <a href="{{ route('ekskul.create') }}" 
-           class="inline-flex items-center rounded-md border border-transparent bg-[#C8963E] px-4 py-2 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2">
-           + Tambah Ekskul Baru
-        </a>
-    </div>
-    @endcan
-</div>
 
-{{-- 2. Wrapper Tabel --}}
-<div class="mt-8 flow-root">
-    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table class="min-w-full">
-                <thead class="sticky top-0 bg-[#F0E6D2]">
+    {{-- Wrapper Konten --}}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        
+        {{-- Tampilan Mobile (Card View) --}}
+        <div class="block sm:hidden divide-y divide-gray-100">
+            @forelse($ekskuls as $ekskul)
+                <div class="p-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h4 class="text-base font-bold text-[#333333]">{{ $ekskul->nama_ekskul }}</h4>
+                            <p class="text-xs text-gray-500 mt-1">{{ $ekskul->deskripsi ?? 'Tidak ada deskripsi' }}</p>
+                        </div>
+                        <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                            {{ $loop->iteration }}
+                        </span>
+                    </div>
+                    
+                    <div class="mt-2 text-sm text-gray-600">
+                        <span class="font-medium">Pembina:</span> {{ $ekskul->pembina?->nama ?? '-' }}
+                    </div>
+
+                    <div class="mt-3 flex items-center justify-end gap-3 border-t border-gray-50 pt-3">
+                        @can('manage ekskul')
+                            <a href="{{ route('ekskul.show', $ekskul->id) }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                                Anggota
+                            </a>
+                            <a href="{{ route('ekskul.edit', $ekskul->id) }}" class="text-sm font-medium text-[#C8963E] hover:text-[#b58937]">
+                                Edit
+                            </a>
+                            <form action="{{ route('ekskul.destroy', $ekskul->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus ekskul ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-800">
+                                    Hapus
+                                </button>
+                            </form>
+                        @endcan
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-gray-500">
+                    Belum ada data ekstrakurikuler.
+                </div>
+            @endforelse
+        </div>
+
+        {{-- Tampilan Desktop (Tabel) --}}
+        <div class="hidden sm:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-[#F0E6D2]">
                     <tr>
-                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">No</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Nama Ekstrakurikuler</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#333333] uppercase tracking-wider">Guru Pembina</th>
-                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                            <span class="sr-only">Aksi</span>
-                        </th>
+                        <th scope="col" class="py-3.5 pl-6 pr-3 text-left text-sm font-semibold text-[#2C5F2D] uppercase tracking-wider w-16">No</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#2C5F2D] uppercase tracking-wider">Nama Ekstrakurikuler</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-[#2C5F2D] uppercase tracking-wider">Guru Pembina</th>
+                        <th scope="col" class="relative py-3.5 pl-3 pr-6 text-right text-sm font-semibold text-[#2C5F2D] uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-700">
+                <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($ekskuls as $ekskul)
-                        <tr>
-                            <td class="border-t border-gray-200 py-5 pl-4 pr-3 text-sm">{{ $loop->iteration }}</td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="py-4 pl-6 pr-3 text-sm text-gray-500">{{ $loop->iteration }}</td>
+                            <td class="px-3 py-4 text-sm">
                                 <div class="font-bold text-[#333333]">{{ $ekskul->nama_ekskul }}</div>
-                                <div class="text-gray-500 truncate max-w-xs">{{ $ekskul->deskripsi ?? 'Tidak ada deskripsi' }}</div>
+                                <div class="text-gray-500 text-xs truncate max-w-xs">{{ $ekskul->deskripsi }}</div>
                             </td>
-                            <td class="border-t border-gray-200 px-3 py-5 text-sm whitespace-nowrap">
+                            <td class="px-3 py-4 text-sm text-gray-600">
                                 {{ $ekskul->pembina?->nama ?? '-' }}
                             </td>
-                            @can('manage ekskul')
-                            <td class="border-t border-gray-200 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                <div class="flex items-center justify-end space-x-4">
-                                    
-                                    {{-- --- TAMBAHKAN TOMBOL INI --- --}}
-                                    <a href="{{ route('ekskul.show', $ekskul->id) }}" class="text-gray-600 hover:text-gray-900">
-                                        Lihat Anggota<span class="sr-only">, {{ $ekskul->nama_ekskul }}</span>
-                                    </a>
-                                    {{-- ----------------------------- --}}
-
-                                    <a href="{{ route('ekskul.edit', $ekskul->id) }}" class="text-[#2C5F2D] hover:text-[#214621]">
-                                        Edit<span class="sr-only">, {{ $ekskul->nama_ekskul }}</span>
-                                    </a>
+                            <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                @can('manage ekskul')
+                                <div class="flex items-center justify-end gap-4">
+                                    <a href="{{ route('ekskul.show', $ekskul->id) }}" class="text-blue-600 hover:text-blue-800">Lihat Anggota</a>
+                                    <a href="{{ route('ekskul.edit', $ekskul->id) }}" class="text-[#C8963E] hover:text-[#b58937]">Edit</a>
                                     <form action="{{ route('ekskul.destroy', $ekskul->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus ekskul ini?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800">
-                                            Hapus<span class="sr-only">, {{ $ekskul->nama_ekskul }}</span>
-                                        </button>
+                                        <button type="submit" class="text-red-600 hover:text-red-800">Hapus</button>
                                     </form>
                                 </div>
+                                @endcan
                             </td>
-                            @endcan
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="border-t border-gray-200 py-8 text-center text-gray-500">
-                                Belum ada data ekstrakurikuler.
+                            <td colspan="4" class="py-12 text-center text-gray-500">
+                                Tidak ada data ekstrakurikuler.
                             </td>
                         </tr>
                     @endforelse
@@ -84,5 +115,4 @@
             </table>
         </div>
     </div>
-</div>
 @endsection

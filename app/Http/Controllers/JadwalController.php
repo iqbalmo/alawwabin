@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guru;
 use App\Models\Jadwal;
 use App\Models\Kelas;
 use App\Models\Mapel;
-use App\Models\Guru;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule; // Import Rule
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth; // <-- 1. PASTIKAN Auth DI-IMPORT
+use Illuminate\Support\Facades\Auth; // Import Rule
+use Illuminate\Validation\Rule; // <-- 1. PASTIKAN Auth DI-IMPORT
 
 class JadwalController extends Controller
 {
@@ -27,7 +26,7 @@ class JadwalController extends Controller
         // ==================================================================
         // PERBAIKAN: Tambahkan filter RBAC di sini
         // ==================================================================
-        
+
         // 1. Ambil user yang sedang login
         $user = Auth::user();
 
@@ -36,35 +35,34 @@ class JadwalController extends Controller
 
         // 3. Terapkan filter RBAC
         // Jika user BUKAN admin, filter jadwal hanya untuk guru_id mereka
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             $jadwalQuery->where('guru_id', $user->guru_id);
         }
-        
-        // ==================================================================
 
+        // ==================================================================
 
         if ($viewType == 'kelas') {
             // --- LOGIKA UNTUK TAMPILAN PER KELAS ---
-            
+
             // 1. Ambil semua kelas (ini tidak perlu difilter, semua boleh lihat daftar kelas)
             $semuaKelas = Kelas::orderBy('tingkat', 'asc')
-                                ->orderBy('nama_kelas', 'asc')
-                                ->get();
-            
+                ->orderBy('nama_kelas', 'asc')
+                ->get();
+
             // 2. Ambil semua jadwal (GUNAKAN QUERY YANG SUDAH DIFILTER)
             $allJadwals = $jadwalQuery->with('mapel', 'guru') // <-- 4. GUNAKAN $jadwalQuery
-                                     ->orderBy('jam_mulai', 'asc')
-                                     ->get();
-            
+                ->orderBy('jam_mulai', 'asc')
+                ->get();
+
             // 3. Kelompokkan jadwal berdasarkan kelas_id
             $groupedByKelas = $allJadwals->groupBy('kelas_id');
 
             // 4. Di dalam setiap grup kelas, kelompokkan lagi berdasarkan hari
             $jadwalsByKelas = $groupedByKelas->map(function ($jadwalsInClass) use ($orderHari) {
-                
+
                 // Kelompokkan berdasarkan hari (misal: Senin, Rabu, Selasa)
                 $groupedByDay = $jadwalsInClass->groupBy('hari');
-                
+
                 // Sortir grup hari ini berdasarkan urutan $orderHari
                 return $groupedByDay->sortBy(function ($_, $hari) use ($orderHari) {
                     return array_search($hari, $orderHari);
@@ -75,16 +73,16 @@ class JadwalController extends Controller
             return view('jadwal.index', [
                 'viewType' => 'kelas',
                 'semuaKelas' => $semuaKelas,
-                'jadwalsByKelas' => $jadwalsByKelas
+                'jadwalsByKelas' => $jadwalsByKelas,
             ]);
 
         } else {
             // --- LOGIKA UNTUK TAMPILAN PER HARI (DEFAULT) ---
-            
+
             // Ambil jadwal (GUNAKAN QUERY YANG SUDAH DIFILTER)
             $jadwals = $jadwalQuery->with('kelas', 'mapel', 'guru') // <-- 4. GUNAKAN $jadwalQuery
-                                 ->orderBy('jam_mulai', 'asc') 
-                                 ->get();
+                ->orderBy('jam_mulai', 'asc')
+                ->get();
 
             $groupedJadwals = $jadwals->groupBy('hari');
 
@@ -94,10 +92,10 @@ class JadwalController extends Controller
                     $orderedJadwals->put($hari, $groupedJadwals->get($hari));
                 }
             }
-            
+
             return view('jadwal.index', [
                 'viewType' => 'hari',
-                'orderedJadwals' => $orderedJadwals
+                'orderedJadwals' => $orderedJadwals,
             ]);
         }
     }
@@ -111,7 +109,7 @@ class JadwalController extends Controller
         $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
         $mapels = Mapel::orderBy('nama_mapel')->get();
         $gurus = Guru::orderBy('nama')->get();
-        
+
         return view('jadwal.create', compact('kelas', 'mapels', 'gurus'));
     }
 
@@ -120,24 +118,46 @@ class JadwalController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi Anda sudah benar
         $request->validate([
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
             'jam_mulai' => 'required',
-            'jam_selesai' => 'required',
+            'jam_selesai' => 'required|after:jam_mulai', // Pastikan selesai setelah mulai
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_id' => 'required|exists:mapels,id',
             'guru_id' => 'required|exists:gurus,id',
-            'jam_mulai' => [ // <-- 'jam_mulai' divalidasi dua kali, ini tidak masalah
-                'required',
-                Rule::unique('jadwals')->where(function ($query) use ($request) {
-                    return $query->where('hari', $request->hari)
-                                 ->where('kelas_id', $request->kelas_id);
-                }),
-            ]
-        ], [
-            'jam_mulai.unique' => 'Jadwal bentrok! Kelas ini sudah ada pelajaran di hari dan jam yang sama.'
         ]);
+
+        // 1. Cek Bentrok Ruangan/Kelas
+        $bentrokKelas = Jadwal::where('hari', $request->hari)
+            ->where('kelas_id', $request->kelas_id)
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
+                    ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('jam_mulai', '<', $request->jam_mulai)
+                            ->where('jam_selesai', '>', $request->jam_selesai);
+                    });
+            })->exists();
+
+        if ($bentrokKelas) {
+            return back()->withErrors(['jam_mulai' => 'Jadwal bentrok! Kelas ini sedang digunakan pada jam tersebut.'])->withInput();
+        }
+
+        // 2. (Opsional) Cek Bentrok Guru - Agar guru tidak mengajar di 2 kelas berbeda bersamaan
+        $bentrokGuru = Jadwal::where('hari', $request->hari)
+            ->where('guru_id', $request->guru_id)
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
+                    ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('jam_mulai', '<', $request->jam_mulai)
+                            ->where('jam_selesai', '>', $request->jam_selesai);
+                    });
+            })->exists();
+
+        if ($bentrokGuru) {
+            return back()->withErrors(['guru_id' => 'Guru ini sedang mengajar di kelas lain pada jam tersebut.'])->withInput();
+        }
 
         Jadwal::create($request->all());
 
@@ -161,24 +181,31 @@ class JadwalController extends Controller
      */
     public function update(Request $request, Jadwal $jadwal)
     {
-        // Validasi Anda sudah benar
         $request->validate([
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu',
             'jam_mulai' => 'required',
-            'jam_selesai' => 'required',
+            'jam_selesai' => 'required|after:jam_mulai',
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_id' => 'required|exists:mapels,id',
             'guru_id' => 'required|exists:gurus,id',
-            'jam_mulai' => [
-                'required',
-                Rule::unique('jadwals')->where(function ($query) use ($request) {
-                    return $query->where('hari', $request->hari)
-                                 ->where('kelas_id', $request->kelas_id);
-                })->ignore($jadwal->id), // Abaikan ID jadwal saat ini
-            ]
-        ], [
-            'jam_mulai.unique' => 'Jadwal bentrok! Kelas ini sudah ada pelajaran di hari dan jam yang sama.'
         ]);
+
+        // Cek Bentrok Kelas (kecuali jadwal ini sendiri)
+        $bentrok = Jadwal::where('id', '!=', $jadwal->id) // Abaikan jadwal yang sedang diedit
+            ->where('hari', $request->hari)
+            ->where('kelas_id', $request->kelas_id)
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
+                    ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('jam_mulai', '<', $request->jam_mulai)
+                            ->where('jam_selesai', '>', $request->jam_selesai);
+                    });
+            })->exists();
+
+        if ($bentrok) {
+            return back()->withErrors(['jam_mulai' => 'Jadwal bentrok dengan jam lain di kelas ini.'])->withInput();
+        }
 
         $jadwal->update($request->all());
 
@@ -191,6 +218,7 @@ class JadwalController extends Controller
     public function destroy(Jadwal $jadwal)
     {
         $jadwal->delete();
+
         return redirect()->route('jadwal.index')->with('success', 'Jadwal berhasil dihapus.');
     }
 }

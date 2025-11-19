@@ -1,122 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id" class="h-full bg-[#F9F9F9]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autentikasi | SITU Al-Awwabin</title>
+    <title>Masuk | SITU Al-Awwabin</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/alawwabin-logo.png') }}">
     @vite('resources/css/app.css')
+    <script src="//unpkg.com/alpinejs" defer></script>
     <style>
-        /* * Palet "Harmoni Klasik"
-         * Hijau Utama: #2C5F2D
-         * Aksen Emas: #C8963E
-         * Netral Latar: #F9F9F9
-         * Netral Sekunder: #F0E6D2
-         * Teks Arang: #333333
-        */
-
-        /* Mengganti warna latar belakang autofill (light mode) */
         [x-cloak] { display: none !important; }
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            -webkit-text-fill-color: #333333 !important; /* */
-            -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important; /* */
-            transition: background-color 5000s ease-in-out 0s;
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
         }
     </style>
-    <script src="//unpkg.com/alpinejs"></script>
 </head>
-<body class="bg-[#F9F9F9] font-sans">
+<body class="h-full font-sans antialiased text-[#333333]">
 
-  <div class="flex min-h-screen">
-    <div class="flex flex-1 flex-col justify-center pt-8 pb-29 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-      <div class="mx-auto w-full max-w-sm lg:w-96">
-        
-        <div>
-          <div class="text-center mb-6">
-            <img src="/img/alawwabin-logo.png" alt="Logo Al-Awwabin" class="mx-auto w-24 h-auto">
-          </div>
-          <h2 class="mt-6 text-3xl font-bold tracking-tight text-[#2C5F2D]">SITU Al-Awwabin</h2>
-          <p class="mt-2 text-sm text-gray-600">
-            Sistem Informasi Tata Usaha MA/MTs Al-Awwabin
-          </p>
-        </div>
+    <div class="min-h-screen flex">
+        <!-- Left Side: Form Area -->
+        <div class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-white z-10 relative">
+            <div class="mx-auto w-full max-w-sm lg:w-96">
+                
+                <!-- Header -->
+                <div class="text-center lg:text-left animate-fade-in-up">
+                    <img class="h-16 w-auto mx-auto lg:mx-0 hover:scale-105 transition-transform duration-300" src="{{ asset('img/alawwabin-logo.png') }}" alt="Logo Al-Awwabin">
+                    <h2 class="mt-6 text-3xl font-extrabold text-[#2C5F2D]">
+                        Selamat Datang
+                    </h2>
+                    <p class="mt-2 text-sm text-[#6b7280]">
+                        Silakan masuk untuk mengakses SITU Al-Awwabin
+                    </p>
+                </div>
 
-        <div class="mt-8">
-          <div class="mt-6">
-            <form action="{{ route('login.post') }}" method="POST" class="space-y-6">
-              @csrf
-              <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email/NIP</label>
-                <div class="mt-1">
-                  <input id="email" name="email" type="text" autocomplete="email" value="{{ old('email') }}" required 
-                         class="block w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#C8963E] focus:outline-none focus:ring-[#C8963E] sm:text-sm @error('email') border-red-500 @enderror">
+                <div class="mt-8 animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="mt-6">
+                        <form action="{{ route('login') }}" method="POST" class="space-y-6">
+                            @csrf
+
+                            <!-- Email Input -->
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-[#333333]">Email atau NIP</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                        </svg>
+                                    </div>
+                                    <input id="email" name="email" type="text" autocomplete="username" required value="{{ old('email') }}"
+                                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm transition duration-150 ease-in-out @error('email') border-red-500 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500 @enderror"
+                                        placeholder="Email atau NIP">
+                                </div>
+                                @error('email')
+                                    <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Password Input -->
+                            <div x-data="{ showPassword: false }">
+                                <label for="password" class="block text-sm font-medium text-[#333333]">Kata Sandi</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <input :type="showPassword ? 'text' : 'password'" id="password" name="password" autocomplete="current-password" required
+                                        class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:border-[#C8963E] sm:text-sm transition duration-150 ease-in-out @error('password') border-red-500 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500 @enderror"
+                                        placeholder="••••••••">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                        <button type="button" @click="showPassword = !showPassword" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition-colors">
+                                            <svg x-show="!showPassword" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <svg x-show="showPassword" x-cloak class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" />
+                                                <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.742L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                @error('password')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input id="remember-me" name="remember" type="checkbox" class="h-4 w-4 text-[#2C5F2D] focus:ring-[#2C5F2D] border-gray-300 rounded transition duration-150 ease-in-out">
+                                    <label for="remember-me" class="ml-2 block text-sm text-[#333333]">
+                                        Ingat saya
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#2C5F2D] to-[#1e421f] hover:from-[#3a7a3b] hover:to-[#2C5F2D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2C5F2D] transform transition hover:-translate-y-0.5 duration-200">
+                                    Masuk
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 
-                {{-- 🚨 NOTIFIKASI ERROR UNTUK EMAIL/PASSWORD SALAH --}}
-                @error('email')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-              </div>
-              
-              <div x-data="{ showPassword: false }">
-                    <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
-                    <div class="mt-2 relative">
-                        <input id="password" name="password" 
-                               {{-- 1. Buat tipe input dinamis --}}
-                               :type="showPassword ? 'text' : 'password'" 
-                               autocomplete="current-password" required
-                               {{-- 2. Tambahkan padding kanan (pr-10) untuk ruang ikon --}}
-                               class="block w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#C8963E] focus:outline-none focus:ring-[#C8963E] sm:text-sm @error('email') border-red-500 @enderror">
-                        
-                        {{-- 3. Tambahkan Tombol Ikon Mata --}}
-                        <button type="button" @click="showPassword = !showPassword"
-                                class="absolute inset-y-0 right-0 flex items-center pr-3"
-                                aria-label="Tampilkan atau sembunyikan password">
-                            
-                            {{-- Ikon Mata (saat password tersembunyi) --}}
-                            <svg x-show="!showPassword" class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-
-                            {{-- Ikon Mata Tercoret (saat password terlihat) --}}
-                            <svg x-show="showPassword" x-cloak class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                            </svg>
-                        </button>
-                    </div>
-                    @error('password')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                <!-- Footer -->
+                <div class="mt-8 text-center animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <p class="text-xs text-[#6b7280]">
+                        &copy; {{ date('Y') }} MTs Al-Awwabin. All rights reserved.
+                    </p>
                 </div>
-
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 bg-white text-[#C8963E] focus:ring-[#C8963E]">
-                  <label for="remember-me" class="ml-2 block text-sm text-gray-600">Ingat saya</label>
-                </div>
-              </div>
-
-              <div>
-                <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-[#C8963E] py-2 px-4 text-sm font-medium text-[#333333] shadow-sm hover:bg-[#b58937] focus:outline-none focus:ring-2 focus:ring-[#C8963E] focus:ring-offset-2 focus:ring-offset-[#F9F9F9]">Masuk </button>
-              </div>
-            </form>
-          </div>
+            </div>
         </div>
 
-      </div>
+        <!-- Right Side: Image Area -->
+        <div class="hidden lg:block relative w-0 flex-1 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#2C5F2D] to-[#C8963E] mix-blend-multiply z-10 opacity-80"></div>
+            <img class="absolute inset-0 h-full w-full object-cover transform hover:scale-105 transition-transform duration-[20s]" src="{{ asset('img/alawwabin-gedung.png') }}" alt="Gedung Sekolah">
+            
+            <!-- Quote / Text Overlay -->
+            <div class="absolute inset-0 z-20 flex flex-col justify-end pb-24 px-12 text-white">
+                <div class="animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-4xl font-bold mb-4">Pendidikan Berkualitas</h3>
+                    <p class="text-lg text-gray-100 max-w-lg">
+                        Membangun generasi berakhlak mulia, cerdas, dan berprestasi untuk masa depan yang gemilang.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="relative hidden w-0 flex-1 lg:block">
-      <div class="absolute inset-0 bg-[#2C5F2D] opacity-60 z-10"></div>
-      <img class="absolute inset-0 h-full w-full object-cover" 
-           src="/img/alawwabin-gedung.png" 
-           alt="Gedung Al-Awwabin">
-    </div>
-  </div>
 
 </body>
 </html>

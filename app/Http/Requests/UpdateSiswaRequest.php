@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreSiswaRequest extends FormRequest
+class UpdateSiswaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,14 +22,17 @@ class StoreSiswaRequest extends FormRequest
      */
     public function rules(): array
     {
+        // $this->siswa is the route parameter (the Siswa model instance)
+        $siswaId = $this->siswa->id;
+
         return [
             'nama' => 'required|string|max:255',
-            'nis' => 'required|string|max:255|unique:siswas,nis',
+            'nis' => 'required|string|max:255|unique:siswas,nis,' . $siswaId,
             'kelas_id' => 'required|exists:kelas,id',
 
             'no_absen' => 'nullable|integer',
-            'nisn' => 'nullable|string|max:255|unique:siswas,nisn',
-            'nik_siswa' => 'nullable|string|max:255|unique:siswas,nik_siswa',
+            'nisn' => 'nullable|string|max:255|unique:siswas,nisn,' . $siswaId,
+            'nik_siswa' => 'nullable|string|max:255|unique:siswas,nik_siswa,' . $siswaId,
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'jenis_kelamin' => 'nullable|in:L,P',
