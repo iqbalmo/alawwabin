@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Guru; // <-- Ganti model ke Guru
+use App\Models\Guru;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 
@@ -17,7 +17,7 @@ class SearchGuru extends Component
     public function render()
     {
         // Logika query yang kita pindahkan dari GuruController
-        $query = Guru::with('mapel'); // <-- Ganti model ke Guru
+        $query = Guru::with('mapels', 'wali');
 
         if (strlen($this->search) >= 1) {
             $query->where(function($q) {
@@ -27,10 +27,10 @@ class SearchGuru extends Component
             });
         }
 
-        $guru = $query->orderBy('nama', 'asc')->paginate(15); // <-- Ganti variabel
+        $guru = $query->orderBy('nama', 'asc')->paginate(15);
 
         return view('livewire.search-guru', [
-            'guru' => $guru, // <-- Ganti variabel
+            'guru' => $guru,
         ]);
     }
 

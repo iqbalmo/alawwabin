@@ -81,9 +81,19 @@
                             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $guru->jabatan ?? '-' }}</dd>
                         </div>
                         <div class="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 hover:bg-gray-50 transition-colors">
-                            <dt class="text-sm font-medium text-gray-500">Mata Pelajaran Utama</dt>
+                            <dt class="text-sm font-medium text-gray-500">Mata Pelajaran Pengampu</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 font-medium text-[#2C5F2D]">
-                                {{ $guru->mapel ? $guru->mapel->nama_mapel : '-' }}
+                                @if($guru->mapels->count() > 0)
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($guru->mapels as $mapel)
+                                            <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                {{ $mapel->nama_mapel }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    -
+                                @endif
                             </dd>
                         </div>
                         <div class="px-6 py-4 sm:grid sm:grid-cols-3 sm:gap-4 hover:bg-gray-50 transition-colors">

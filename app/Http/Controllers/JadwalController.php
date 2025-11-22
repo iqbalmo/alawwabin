@@ -44,15 +44,25 @@ class JadwalController extends Controller
         if ($viewType == 'kelas') {
             // --- LOGIKA UNTUK TAMPILAN PER KELAS ---
 
-            // 1. Ambil semua kelas (ini tidak perlu difilter, semua boleh lihat daftar kelas)
-            $semuaKelas = Kelas::orderBy('tingkat', 'asc')
-                ->orderBy('nama_kelas', 'asc')
-                ->get();
-
-            // 2. Ambil semua jadwal (GUNAKAN QUERY YANG SUDAH DIFILTER)
-            $allJadwals = $jadwalQuery->with('mapel', 'guru') // <-- 4. GUNAKAN $jadwalQuery
+            // 1. Ambil semua jadwal DULU (GUNAKAN QUERY YANG SUDAH DIFILTER)
+            $allJadwals = $jadwalQuery->with('mapel', 'guru')
                 ->orderBy('jam_mulai', 'asc')
                 ->get();
+
+            // 2. Ambil Kelas
+            // Jika user bukan admin, hanya ambil kelas yang ada di jadwal mereka
+            if (! $user->hasRole('admin')) {
+                $kelasIds = $allJadwals->pluck('kelas_id')->unique();
+                $semuaKelas = Kelas::whereIn('id', $kelasIds)
+                    ->orderBy('tingkat', 'asc')
+                    ->orderBy('nama_kelas', 'asc')
+                    ->get();
+            } else {
+                // Jika admin, ambil semua kelas
+                $semuaKelas = Kelas::orderBy('tingkat', 'asc')
+                    ->orderBy('nama_kelas', 'asc')
+                    ->get();
+            }
 
             // 3. Kelompokkan jadwal berdasarkan kelas_id
             $groupedByKelas = $allJadwals->groupBy('kelas_id');

@@ -34,7 +34,8 @@ class StoreGuruRequest extends FormRequest
             'tahun_mulai_bekerja' => 'nullable|string:4',
             'jabatan' => 'nullable|string|max:100',
             'status_kepegawaian' => 'nullable|in:PNS,Swasta',
-            'mapel_id' => 'nullable|exists:mapels,id',
+            'mapel_ids' => 'nullable|array',
+            'mapel_ids.*' => 'exists:mapels,id',
             'alamat' => 'nullable|string',
             'telepon' => 'nullable|string|max:20',
         ];

@@ -31,6 +31,17 @@
                 <div class="p-4 hover:bg-gray-50 transition-colors">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-base font-bold text-[#333333]">{{ $mapel->nama_mapel }}</h4>
+                        @if($mapel->gurus->count() > 0)
+                            <div class="mt-1 flex flex-wrap gap-1">
+                                @foreach($mapel->gurus as $guru)
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
+                                        {{ $guru->nama }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="mt-1 text-xs text-gray-500">Tidak ada guru pengampu</p>
+                        @endif
                         <span class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                             {{ $loop->iteration }}
                         </span>
@@ -77,6 +88,17 @@
                             <td class="py-4 pl-6 pr-3 text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-3 py-4 text-sm font-bold text-[#333333]">
                                 {{ $mapel->nama_mapel }}
+                                @if($mapel->gurus->count() > 0)
+                                    <div class="mt-1 flex flex-wrap gap-1">
+                                        @foreach($mapel->gurus as $guru)
+                                            <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
+                                                {{ $guru->nama }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="mt-1 text-xs text-gray-500">Tidak ada guru pengampu</p>
+                                @endif
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 @can('manage mapel')

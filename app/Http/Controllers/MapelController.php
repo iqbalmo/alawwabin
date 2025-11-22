@@ -10,7 +10,7 @@ class MapelController extends Controller
 {
     public function index()
     {
-        $mapels = Mapel::with('guru')->get();
+        $mapels = Mapel::with('gurus')->get();
         return view('mapels.index', compact('mapels'));
     }
 
@@ -24,13 +24,18 @@ class MapelController extends Controller
     {
         $request->validate([
             'nama_mapel' => 'required|string|max:255',
-            'guru_id' => 'nullable|exists:gurus,id',
+            'guru_ids' => 'nullable|array',
+            'guru_ids.*' => 'exists:gurus,id',
         ]);
 
-        Mapel::create([
+        $mapel = Mapel::create([
             'nama_mapel' => $request->input('nama_mapel'),
-            'guru_id' => $request->input('guru_id'),
         ]);
+
+        // Attach selected gurus to this mapel
+        if ($request->has('guru_ids')) {
+            $mapel->gurus()->attach($request->input('guru_ids'));
+        }
 
         return redirect()->route('mapels.index')->with('success', 'Mata pelajaran berhasil ditambahkan.');
     }
@@ -50,22 +55,17 @@ class MapelController extends Controller
     {
         $request->validate([
             'nama_mapel' => 'required|string|max:255|unique:mapels,nama_mapel,' . $mapel->id,
-            'guru_id' => 'nullable|exists:gurus,id',
+            'guru_ids' => 'nullable|array',
+            'guru_ids.*' => 'exists:gurus,id',
         ]);
 
-        // 1. Update data dasar mata pelajaran
+        // Update mapel data
         $mapel->update([
             'nama_mapel' => $request->input('nama_mapel'),
-            'guru_id' => $request->input('guru_id'), // Update guru utama
         ]);
 
-        // 2. SINKRONISASI RELASI
-        // Jika ada guru_id yang dipilih, kita tidak perlu melakukan sync/detach karena
-        // relasi didefinisikan sebagai hasMany (Guru milik Mapel) atau belongsTo (Mapel milik Guru).
-        // Update 'guru_id' pada tabel mapels sudah dilakukan di atas.
-        
-        // Jika ingin mengupdate mapel_id pada tabel gurus (Guru mengajar Mapel ini),
-        // itu sebaiknya dilakukan di menu Manajemen Guru.
+        // Sync gurus (remove old relationships, add new ones)
+        $mapel->gurus()->sync($request->input('guru_ids', []));
 
         return redirect()->route('mapels.index')->with('success', 'Mata pelajaran berhasil diperbarui.');
     }

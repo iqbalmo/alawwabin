@@ -14,6 +14,7 @@ use App\Http\Controllers\{
     SiswaController,
     EkskulController,
     AgendaController,
+    TahunAjaranController,
 };
 
 // 🔹 Redirect root ke dashboard home
@@ -138,4 +139,22 @@ Route::middleware(['auth'])->group(function () {
         $siswas = App\Models\Siswa::where('kelas_id', $jadwal->kelas_id)->get();
         return response()->json($siswas);
     })->middleware('permission:manage absensi');
+
+    // -----------------------------------------------------------------
+    // 🔹 TAHUN AJARAN (Admin only)
+    // -----------------------------------------------------------------
+    Route::middleware(['permission:manage siswa'])->group(function () {
+        Route::resource('tahun-ajaran', TahunAjaranController::class)->except(['show']);
+        Route::post('/tahun-ajaran/{tahunAjaran}/set-active', [TahunAjaranController::class, 'setActive'])->name('tahun-ajaran.set-active');
+    });
+
+    // -----------------------------------------------------------------
+    // 🔹 REKAP ABSENSI
+    // -----------------------------------------------------------------
+    Route::prefix('absensi/rekap')->name('absensi.rekap.')->controller(App\Http\Controllers\AbsensiRekapController::class)->group(function () {
+        Route::get('/', 'index')->name('index'); // Overview rekap absensi
+        Route::get('/kelas/{kelas}', 'perKelas')->name('kelas'); // Rekap per kelas
+        Route::get('/siswa/{siswa}', 'perSiswa')->name('siswa'); // Rekap per siswa
+        Route::get('/export/{type}/{kelas}', 'export')->name('export'); // Export PDF/Excel
+    });
 });

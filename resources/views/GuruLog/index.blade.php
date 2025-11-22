@@ -26,7 +26,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Main Column --}}
-    <div class="lg:col-span-2 space-y-6">
+    <div class="lg:col-span-2 flex flex-col gap-6">
         
         {{-- Today's Schedule --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -97,6 +97,41 @@
             @endif
         </div>
 
+
+
+        {{-- Today's Events Card --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1">
+            <div class="bg-[#F0E6D2] px-6 py-4 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-[#2C5F2D]">Agenda Hari Ini</h3>
+            </div>
+            <div class="p-4">
+                @if($todayEvents->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($todayEvents as $event)
+                            <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <div class="w-1 h-full min-h-[2rem] bg-[#C8963E] rounded-full"></div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 text-sm">{{ $event->title }}</h4>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        @if($event->start_time)
+                                            {{ \Carbon\Carbon::parse($event->start_time)->format('H:i') }}
+                                            @if($event->end_time) - {{ \Carbon\Carbon::parse($event->end_time)->format('H:i') }} @endif
+                                        @else
+                                            Sepanjang hari
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-6 text-gray-500">
+                        <p class="text-sm">Tidak ada agenda kegiatan hari ini.</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
     </div>
 
     {{-- Sidebar Column --}}
@@ -113,6 +148,8 @@
                 </div>
             </div>
         </div>
+
+
 
     </div>
 
@@ -288,26 +325,13 @@
             right: 0.3rem;
         }
 
-        /* Events */
-        .fc-event {
-            margin: 1px 2px;
-            padding: 2px 4px !important;
-            font-size: 0.65rem !important;
-            border-radius: 0.25rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            border: none !important;
-            transition: opacity 0.2s;
-        }
-
-        .fc-event:hover {
-            opacity: 0.8;
-        }
-
-        .fc-daygrid-event-harness {
-            margin-top: 1.6rem;
+        /* Sembunyikan semua event default dari FullCalendar */
+        .fc-event,
+        .fc-daygrid-event,
+        .fc-daygrid-event-harness,
+        .fc-daygrid-block-event,
+        .fc-h-event {
+            display: none !important;
         }
 
         /* Responsive */
@@ -343,6 +367,14 @@
             const canManageEvents = @json(Auth::user()->can('manage events'));
             const today = new Date().toISOString().split('T')[0];
 
+            // Helper: Check if event is on date
+            const isEventOnDate = (event, targetDateStr) => {
+                const startStr = event.startStr.split('T')[0];
+                if (!event.end) return startStr === targetDateStr;
+                const endStr = event.endStr.split('T')[0];
+                return targetDateStr >= startStr && targetDateStr < endStr;
+            };
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'id',
@@ -367,6 +399,11 @@
 
                 events: {!! $eventsJson !!},
 
+                // Sembunyikan event default
+                eventContent: function() {
+                    return { html: '' };
+                },
+
                 dateClick: function(info) {
                     showModal(info.date);
                 },
@@ -376,28 +413,67 @@
                     showModal(info.event.start);
                 },
 
-                eventContent: function(arg) {
-                    const title = arg.event.title;
-                    const time = arg.timeText ? `<small style="opacity:0.8; margin-left:4px;">${arg.timeText}</small>` : '';
-                    return {
-                        html: `<div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; font-size:0.65rem;">
-                             ${title}${time}
-                           </div>`
-                    };
+                // Render custom dots
+                eventsSet: function() {
+                    renderEventDots();
                 },
-
-                eventDidMount: function(info) {
-                    info.el.style.backgroundColor = info.event.backgroundColor || '#C8963E';
-                    info.el.style.borderColor = info.event.borderColor || '#C8963E';
-                    info.el.style.color = '#333';
-                },
-
-                dayCellDidMount: function(info) {
-                    if (info.date.toISOString().split('T')[0] === today) {
-                        info.el.style.backgroundColor = '#f0fdf4';
-                    }
+                
+                datesSet: function() {
+                    renderEventDots();
                 }
             });
+
+            // Debounce timer
+            let renderTimeout = null;
+            
+            // Fungsi untuk render dots
+            function renderEventDots() {
+                if (renderTimeout) clearTimeout(renderTimeout);
+                
+                renderTimeout = setTimeout(() => {
+                    document.querySelectorAll('.custom-event-dot').forEach(el => el.remove());
+                    
+                    document.querySelectorAll('.fc-daygrid-day').forEach(dayEl => {
+                        const dateStr = dayEl.getAttribute('data-date');
+                        if (!dateStr) return;
+                        
+                        if (dayEl.querySelector('.custom-event-dot')) return;
+                        
+                        const eventsOnDay = calendar.getEvents().filter(event => isEventOnDate(event, dateStr));
+                        
+                        if (eventsOnDay.length > 0) {
+                            const lineContainer = document.createElement('div');
+                            lineContainer.className = 'custom-event-dot absolute bottom-1 left-0 right-0 flex items-center justify-center gap-1';
+                            lineContainer.style.cssText = 'cursor: pointer; height: 12px;';
+                            
+                            const line = document.createElement('div');
+                            line.className = 'w-6 h-0.5 bg-[#C8963E] rounded-full flex-shrink-0';
+                            
+                            if (eventsOnDay.length > 1) {
+                                const badge = document.createElement('span');
+                                badge.className = 'text-[10px] font-bold text-[#C8963E] leading-none';
+                                badge.textContent = `${eventsOnDay.length}`;
+                                lineContainer.appendChild(line);
+                                lineContainer.appendChild(badge);
+                            } else {
+                                lineContainer.appendChild(line);
+                            }
+                            
+                            const dayFrame = dayEl.querySelector('.fc-daygrid-day-frame');
+                            if (dayFrame) {
+                                dayFrame.style.position = 'relative';
+                                dayFrame.appendChild(lineContainer);
+                            }
+                            
+                            lineContainer.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const date = new Date(dateStr + 'T00:00:00');
+                                showModal(date);
+                            });
+                        }
+                    });
+                }, 100);
+            }
 
             calendar.render();
 
@@ -416,7 +492,14 @@
                 document.getElementById('modal-title').textContent = `Kegiatan pada ${formatted}`;
 
                 const dateStr = date.toISOString().split('T')[0];
-                document.getElementById('modal-add-event-link').href = '{{ route('events.create') }}?date=' + dateStr;
+                const addEventLink = document.getElementById('modal-add-event-link');
+                
+                if (canManageEvents) {
+                    addEventLink.href = '{{ route('events.create') }}?date=' + dateStr;
+                    addEventLink.style.display = 'inline-flex';
+                } else {
+                    addEventLink.style.display = 'none';
+                }
 
                 const eventList = document.getElementById('modal-event-list');
                 const noEvents = document.getElementById('modal-no-events');
@@ -432,16 +515,21 @@
                     events.forEach(e => {
                         const li = document.createElement('li');
                         li.className = 'p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-100 hover:shadow-sm transition-shadow';
-                        const time = e.start ?
-                            e.start.toLocaleTimeString('id-ID', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }) +
-                            (e.end ? ' - ' + e.end.toLocaleTimeString('id-ID', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }) : '') :
-                            '';
+                        
+                        // Gunakan extendedProps jika ada, atau fallback ke default
+                        let time = '';
+                        if (e.extendedProps && e.extendedProps.start_time) {
+                            time = e.extendedProps.start_time;
+                            if (e.extendedProps.end_time) {
+                                time += ' - ' + e.extendedProps.end_time;
+                            }
+                        } else if (e.start) {
+                            time = e.start.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                            if (e.end) {
+                                time += ' - ' + e.end.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                            }
+                        }
+
                         li.innerHTML = `
                         <div class="flex items-start gap-3">
                             <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style="background:${e.backgroundColor || '#C8963E'}"></div>

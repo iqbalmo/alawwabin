@@ -27,25 +27,32 @@ class GuruController extends Controller
     public function store(StoreGuruRequest $request)
     {
         $validatedData = $request->validated();
+        
+        // Ambil mapel_ids dan hapus dari validatedData agar tidak error saat create
+        $mapelIds = $validatedData['mapel_ids'] ?? [];
+        unset($validatedData['mapel_ids']);
 
-        Guru::create($validatedData);
+        $guru = Guru::create($validatedData);
+        
+        // Attach mapels
+        if (!empty($mapelIds)) {
+            $guru->mapels()->attach($mapelIds);
+        }
 
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil ditambahkan.');
     }
 
-    // --- TAMBAHKAN METHOD BARU INI ---
     /**
      * Menampilkan halaman detail untuk satu guru.
      */
     public function show(Guru $guru)
     {
-        // Eager load relasi 'mapel' (Mapel yg diampu) 
+        // Eager load relasi 'mapels' (Mapel yg diampu) 
         // dan 'kelasWali' (Kelas yg dia jadi walinya)
-        $guru->load('mapel', 'wali'); 
+        $guru->load('mapels', 'wali'); 
         
         return view('guru.show', compact('guru'));
     }
-    // ---------------------------------
 
     public function edit(Guru $guru)
     {
@@ -56,8 +63,15 @@ class GuruController extends Controller
     public function update(UpdateGuruRequest $request, Guru $guru)
     {
         $validatedData = $request->validated();
+        
+        // Ambil mapel_ids dan hapus dari validatedData
+        $mapelIds = $validatedData['mapel_ids'] ?? [];
+        unset($validatedData['mapel_ids']);
 
         $guru->update($validatedData);
+        
+        // Sync mapels
+        $guru->mapels()->sync($mapelIds);
 
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil diperbarui.');
     }

@@ -154,6 +154,15 @@
                                     Kenaikan Kelas
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('absensi.rekap.index') }}" wire:navigate
+                                    class="{{ request()->routeIs('absensi.rekap.*') 
+                                        ? 'bg-[#C8963E] text-white shadow-sm' 
+                                        : 'text-gray-300 hover:text-white hover:bg-[#3a7a3b]' }} 
+                                        block rounded-lg py-2 pr-2 pl-11 text-sm leading-6 transition-all duration-200">
+                                    Rekap Absensi
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endcan
@@ -231,6 +240,22 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                         </svg>
                         Agenda Mengajar
+                    </a>
+                </li>
+                @endcan
+
+                {{-- Tahun Ajaran --}}
+                @can('manage siswa')
+                <li>
+                    <a href="{{ route('tahun-ajaran.index') }}" wire:navigate
+                       class="{{ request()->routeIs('tahun-ajaran.*') 
+                           ? 'bg-[#C8963E] text-white shadow-md' 
+                           : 'text-gray-100 hover:text-white hover:bg-[#3a7a3b]' }} 
+                           group flex gap-x-3 rounded-lg p-2.5 text-sm leading-6 font-semibold transition-all duration-200">
+                        <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('tahun-ajaran.*') ? 'text-white' : 'text-[#F0E6D2] group-hover:text-white' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        Tahun Ajaran
                     </a>
                 </li>
                 @endcan

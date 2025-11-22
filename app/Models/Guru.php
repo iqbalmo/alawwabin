@@ -36,6 +36,16 @@ class Guru extends Model
         return $this->belongsTo(Mapel::class, 'mapel_id');
     }
 
+    /**
+     * Relasi Many-to-Many dengan Mapel
+     * Satu guru bisa mengajar banyak mata pelajaran
+     */
+    public function mapels()
+    {
+        return $this->belongsToMany(Mapel::class, 'guru_mapel')
+                    ->withTimestamps();
+    }
+
     public function wali()
     {
         return $this->hasOne(Kelas::class, 'wali_kelas');

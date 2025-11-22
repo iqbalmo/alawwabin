@@ -85,17 +85,28 @@ class GuruLogController extends Controller
         // 3. Ambil data Event untuk Kalender (sama seperti di HomeController)
         $events = \App\Models\Event::all()->map(function ($event) {
             return [
+                'id' => $event->id, // Tambahkan ID untuk referensi
                 'title' => $event->title,
                 'start' => $event->start_date,
                 'end' => $event->end_date,
                 'backgroundColor' => $event->color ?? '#3788d8',
                 'borderColor' => $event->color ?? '#3788d8',
+                'extendedProps' => [
+                    'start_time' => $event->start_time ? \Carbon\Carbon::parse($event->start_time)->format('H:i') : null,
+                    'end_time' => $event->end_time ? \Carbon\Carbon::parse($event->end_time)->format('H:i') : null,
+                ]
             ];
         });
         $eventsJson = json_encode($events);
 
+        // 4. Ambil Event Hari Ini
+        $todayEvents = \App\Models\Event::whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->orderBy('start_time')
+            ->get();
+
         // Kirim semua data ke view
-        return view('gurulog.index', compact('guruLogs', 'jadwalHariIni', 'eventsJson'));
+        return view('gurulog.index', compact('guruLogs', 'jadwalHariIni', 'eventsJson', 'todayEvents'));
     }
 
     // Edit rekap harian

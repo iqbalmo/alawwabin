@@ -116,19 +116,29 @@
                     </div>
                 </div>
 
-                {{-- Mapel Utama --}}
-                <div class="sm:col-span-3">
-                    <label for="mapel_id" class="block text-sm font-medium leading-6 text-gray-900">Mata Pelajaran Utama</label>
-                    <div class="mt-2">
-                        <select id="mapel_id" name="mapel_id" class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
-                            <option value="">-- Tidak Mengampu Mapel Utama --</option>
+                {{-- Mapel Pengampu --}}
+                <div class="sm:col-span-6">
+                    <label class="block text-sm font-medium leading-6 text-gray-900 mb-3">Mata Pelajaran Pengampu</label>
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             @foreach($mapels as $mapel)
-                            <option value="{{ $mapel->id }}" {{ old('mapel_id', $guru->mapel_id) == $mapel->id ? 'selected' : '' }}>
-                                {{ $mapel->nama_mapel }}
-                            </option>
+                            <div class="relative flex items-start">
+                                <div class="flex h-6 items-center">
+                                    <input id="mapel_{{ $mapel->id }}" name="mapel_ids[]" type="checkbox" value="{{ $mapel->id }}"
+                                           {{ in_array($mapel->id, old('mapel_ids', $guru->mapels->pluck('id')->toArray())) ? 'checked' : '' }}
+                                           class="h-4 w-4 rounded border-gray-300 text-[#2C5F2D] focus:ring-[#C8963E]">
+                                </div>
+                                <div class="ml-3 text-sm leading-6">
+                                    <label for="mapel_{{ $mapel->id }}" class="font-medium text-gray-900 select-none cursor-pointer">{{ $mapel->nama_mapel }}</label>
+                                </div>
+                            </div>
                             @endforeach
-                        </select>
+                        </div>
+                        @if($mapels->isEmpty())
+                            <p class="text-sm text-gray-500 italic">Belum ada data mata pelajaran.</p>
+                        @endif
                     </div>
+                    <p class="mt-2 text-xs text-gray-500">Centang mata pelajaran yang diajarkan oleh guru ini.</p>
                 </div>
 
                 {{-- Status Kepegawaian --}}

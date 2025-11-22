@@ -78,8 +78,18 @@
                             {{ $g->jabatan ?? '-' }}
                         </div>
                         <div>
-                            <span class="block text-xs text-gray-400">Mapel Utama</span>
-                            {{ $g->mapel ? $g->mapel->nama_mapel : '-' }}
+                            <span class="block text-xs text-gray-400">Mapel Pengampu</span>
+                            @if($g->mapels->count() > 0)
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    @foreach($g->mapels as $mapel)
+                                        <span class="inline-flex items-center rounded-md bg-green-50 px-1.5 py-0.5 text-[10px] font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                            {{ $mapel->nama_mapel }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @else
+                                -
+                            @endif
                         </div>
                     </div>
 
@@ -142,8 +152,18 @@
                                     <div>{{ $g->nip ?? '-' }}</div>
                                     <div class="text-xs">{{ $g->jabatan ?? '-' }}</div>
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $g->mapel ? $g->mapel->nama_mapel : '-' }}
+                                <td class="px-3 py-4 text-sm text-gray-500">
+                                    @if($g->mapels->count() > 0)
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach($g->mapels as $mapel)
+                                                <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                                    {{ $mapel->nama_mapel }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                     {{ $g->telepon ?? '-' }}

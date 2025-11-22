@@ -26,7 +26,7 @@
                 <label for="guru_id" class="block text-sm font-medium text-gray-700 mb-2">Filter Berdasarkan Guru</label>
                 
                 <select id="guru_id" wire:model.live="selectedGuruId" 
-                        class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-[#2C5F2D] focus:ring-[#2C5F2D] sm:max-w-xs sm:text-sm">
+                        class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                     <option value="">-- Tampilkan Semua Guru --</option>
                     @foreach($allGurus as $guru)
                         <option value="{{ $guru->id }}">{{ $guru->nama }}</option>
