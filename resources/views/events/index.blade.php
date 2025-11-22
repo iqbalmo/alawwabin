@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Event | SITU Al-Awwabin')
+@section('title', 'Manajemen Event | SIAP Al-Awwabin')
 
 @section('content')
 <div class="sm:flex sm:items-center sm:justify-between mb-6">

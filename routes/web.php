@@ -11,6 +11,7 @@ use App\Http\Controllers\{
     KelasController,
     MapelController,
     NilaiController,
+    NotificationController,
     SiswaController,
     EkskulController,
     AgendaController,
@@ -38,6 +39,11 @@ Route::middleware(['auth'])->group(function () {
     // Ubah password boleh dilakukan semua user
     Route::get('/ubah-password', [AuthController::class, 'showPasswordForm'])->name('password.edit');
     Route::post('/ubah-password', [AuthController::class, 'updatePassword'])->name('password.update');
+
+    // Notifications (all authenticated users)
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
     // -----------------------------------------------------------------
     // 🔹 MANAJEMEN SISWA (Admin & Wali Kelas)

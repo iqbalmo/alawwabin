@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Kelas | SITU Al-Awwabin')
+@section('title', 'Edit Kelas | SIAP Al-Awwabin')
 
 @section('content')
 <div class="max-w-2xl mx-auto">

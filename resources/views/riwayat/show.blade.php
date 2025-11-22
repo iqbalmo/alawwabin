@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Rekap Absensi | SITU Al-Awwabin')
+@section('title', 'Detail Rekap Absensi | SIAP Al-Awwabin')
 
 @section('content')
 <h2 class="text-2xl font-bold text-[#2C5F2D] mb-4">Detail Rekap Absensi</h2>

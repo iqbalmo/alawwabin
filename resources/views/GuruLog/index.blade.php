@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Guru | SITU Al-Awwabin')
+@section('title', 'Dashboard Guru | SIAP Al-Awwabin')
 
 @section('content')
 

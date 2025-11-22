@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Beranda | SITU Al-Awwabin')
+@section('title', 'Beranda | SIAP Al-Awwabin')
 
 @section('content')
     <div class="space-y-8 animate-fade-in-up">

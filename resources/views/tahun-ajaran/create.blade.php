@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Tahun Ajaran | SITU Al-Awwabin')
+@section('title', 'Tambah Tahun Ajaran | SIAP Al-Awwabin')
 
 @section('content')
 

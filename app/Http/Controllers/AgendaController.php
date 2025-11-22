@@ -87,13 +87,38 @@ class AgendaController extends Controller
             }
         }
 
-        Agenda::create([
+        $agenda = Agenda::create([
             'user_id' => $user->id,
             'jadwal_id' => $validated['jadwal_id'],
             'tanggal' => $validated['tanggal'],
             'materi_diajarkan' => $validated['materi_diajarkan'],
             'absensi_siswa' => $validated['absensi_siswa'], // Disimpan sebagai JSON
         ]);
+
+        // Create notification for all admins
+        $jadwal = Jadwal::with('kelas', 'mapel', 'guru')->find($validated['jadwal_id']);
+        $guruName = $jadwal->guru->nama ?? 'Guru';
+        $tingkat = $jadwal->kelas->tingkat ?? '';
+        $namaKelas = $jadwal->kelas->nama_kelas ?? 'Kelas';
+        $kelasLengkap = $tingkat ? "Kelas {$tingkat} - {$namaKelas}" : $namaKelas;
+        $mapelName = $jadwal->mapel->nama_mapel ?? 'Mata Pelajaran';
+
+        $admins = \App\Models\User::role('admin')->get();
+        foreach ($admins as $admin) {
+            \App\Models\Notification::create([
+                'user_id' => $admin->id,
+                'type' => 'agenda_created',
+                'title' => 'Agenda Baru Ditambahkan',
+                'message' => "{$guruName} mengisi agenda untuk {$kelasLengkap} - {$mapelName}",
+                'data' => [
+                    'agenda_id' => $agenda->id,
+                    'jadwal_id' => $jadwal->id,
+                    'guru_name' => $guruName,
+                    'kelas_name' => $kelasLengkap,
+                    'mapel_name' => $mapelName,
+                ],
+            ]);
+        }
 
         return redirect()->route('agenda.index')->with('success', 'Agenda mengajar berhasil disimpan.');
     }

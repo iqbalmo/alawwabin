@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk | SITU Al-Awwabin</title>
+    <title>Masuk | SIAP Al-Awwabin</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/alawwabin-logo.png') }}">
     @vite('resources/css/app.css')
     <script src="//unpkg.com/alpinejs" defer></script>
@@ -29,7 +29,7 @@
                         Selamat Datang
                     </h2>
                     <p class="mt-2 text-sm text-[#6b7280]">
-                        Silakan masuk untuk mengakses SITU Al-Awwabin
+                        Silakan masuk untuk mengakses SIAP Al-Awwabin
                     </p>
                 </div>
 

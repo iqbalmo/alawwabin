@@ -53,4 +53,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Guru::class);
     }
+
+    // Relasi ke Notifications
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

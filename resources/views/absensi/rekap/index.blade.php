@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi | SITU Al-Awwabin')
+@section('title', 'Rekap Absensi | SIAP Al-Awwabin')
 
 @section('content')
 <div class="space-y-6">

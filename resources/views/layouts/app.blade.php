@@ -17,7 +17,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'SITU Al-Awwabin')</title>
+    <title>@yield('title', 'SIAP Al-Awwabin')</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/alawwabin-logo.png') }}">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
     @livewireStyles
@@ -80,8 +80,8 @@
 
                     <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#2C5F2D] px-6 pb-4">
                         <div class="flex h-16 shrink-0 items-center gap-3">
-                            <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SITU Al-Awwabin">
-                            <span class="text-white font-semibold text-sm">SITU Al-Awwabin</span>
+                            <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SIAP Al-Awwabin">
+                            <span class="text-white font-semibold text-sm">SIAP Al-Awwabin</span>
                         </div>
 
                         @auth
@@ -96,8 +96,8 @@
         <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
             <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#2C5F2D] px-6 pb-4 shadow-xl">
                 <div class="flex h-16 shrink-0 items-center gap-3">
-                    <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SITU Al-Awwabin">
-                    <span class="text-white font-semibold text-sm">SITU Al-Awwabin</span>
+                    <img class="h-10 w-auto" src="{{ asset('img/alawwabin-logo.png') }}" alt="SIAP Al-Awwabin">
+                    <span class="text-white font-semibold text-sm">SIAP Al-Awwabin</span>
                 </div>
 
                 @auth
@@ -122,7 +122,7 @@
                     <ol role="list" class="flex items-center space-x-2 text-sm">
                         @section('breadcrumbs')
                             <li>
-                                <span class="text-gray-600 font-medium">Sistem Informasi Terpadu Al-Awwabin</span>
+                                <span class="text-gray-600 font-medium">Sistem Informasi & Administrasi Pendidikan Al-Awwabin</span>
                             </li>
                         @show
                     </ol>
@@ -130,13 +130,8 @@
 
                 {{-- Right Menu --}}
                 <div class="flex items-center gap-x-4 lg:gap-x-6">
-                    {{-- Notification Button --}}
-                    <button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-[#2C5F2D] transition-colors relative">
-                        <span class="sr-only">Lihat notifikasi</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                        </svg>
-                    </button>
+                    {{-- Notification Bell (Livewire) --}}
+                    @livewire('notification-bell')
 
                     {{-- User Dropdown --}}
                     @auth
@@ -231,7 +226,7 @@
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p class="text-sm text-gray-500">
-                            &copy; {{ date('Y') }} <span class="font-semibold text-[#2C5F2D]">SITU Al-Awwabin</span>. Hak Cipta Dilindungi.
+                            &copy; {{ date('Y') }} <span class="font-semibold text-[#2C5F2D]">SIAP Al-Awwabin</span>. Hak Cipta Dilindungi.
                         </p>
                         <div class="flex items-center gap-4 text-xs text-gray-400">
                             <span>MTs Al-Awwabin</span>

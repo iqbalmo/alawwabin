@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi ' . $siswa->nama . ' | SITU Al-Awwabin')
+@section('title', 'Rekap Absensi ' . $siswa->nama . ' | SIAP Al-Awwabin')
 
 @section('content')
 <div class="space-y-6">
