@@ -94,10 +94,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/ekskul/{ekskul}/detach/{siswa}', [EkskulController::class, 'detachSiswa'])->name('ekskul.detachSiswa');
     });
 
-    // Event Kalender (Hanya Admin, kita pakai role karena tidak ada permission spesifik)
+    // Event Kalender (Hanya Admin)
     Route::resource('events', EventController::class)
-         ->only(['index', 'create', 'store', 'destroy'])
-         ->middleware('role:admin'); // Asumsi hanya admin yg boleh kelola event
+         ->middleware('role:admin');
 
     // -----------------------------------------------------------------
     // 🔹 LOG & RIWAYAT

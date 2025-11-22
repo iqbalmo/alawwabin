@@ -100,7 +100,7 @@
                 </div>
             </div>
 
-            {{-- 4. Kalender Mini / Agenda --}}
+            {{-- 4. Kalender Mini --}}
             <div class="lg:col-span-2 bg-white border border-gray-100 shadow-sm rounded-xl p-6">
                 <h3 class="text-lg font-semibold text-[#333333] mb-4 flex items-center">
                     <span class="w-1 h-6 bg-[#2C5F2D] rounded-full mr-3"></span>
@@ -204,6 +204,15 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+
+        /* Sembunyikan semua event default dari FullCalendar */
+        .fc-event,
+        .fc-daygrid-event,
+        .fc-daygrid-event-harness,
+        .fc-daygrid-block-event,
+        .fc-h-event {
+            display: none !important;
+        }
     </style>
 @endpush
 
@@ -260,34 +269,59 @@
             modalCloseBtn.onclick = closeModal;
             modalOverlay.onclick = closeModal;
 
-            const showDateDetails = (date) => {
-                const formattedDate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            // Helper: Check if event is on date (Robust String Comparison)
+            const isEventOnDate = (event, targetDateStr) => {
+                const startStr = event.startStr.split('T')[0];
+                if (!event.end) return startStr === targetDateStr;
+                const endStr = event.endStr.split('T')[0];
+                return targetDateStr >= startStr && targetDateStr < endStr;
+            };
+
+            const showDateDetails = (dateObj, dateStr) => {
+                const formattedDate = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
                 modalTitle.textContent = `Kegiatan: ${formattedDate}`;
-                const dateStr = date.toISOString().split('T')[0];
+                
                 modalAddEventLink.href = '{{ route('events.create') }}' + '?date=' + dateStr;
                 modalEventList.innerHTML = '';
 
                 const allEvents = calendar.getEvents();
-                const eventsOnDay = allEvents.filter(event => event.start.toDateString() === date.toDateString());
+                const eventsOnDay = allEvents.filter(event => isEventOnDate(event, dateStr));
 
                 if (eventsOnDay.length > 0) {
                     modalNoEvents.classList.add('hidden');
                     modalEventList.classList.remove('hidden');
                     eventsOnDay.forEach(event => {
                         const li = document.createElement('li');
-                        li.className = 'p-3 bg-[#F9F9F9] rounded-lg border border-gray-100 flex items-start space-x-3';
+                        // Styling khusus sesuai request user (Background Krem)
+                        li.className = 'p-3 bg-[#F0E6D2] rounded-lg flex items-center justify-between space-x-3';
                         
-                        let timeString = '';
-                        if (event.start) {
-                            timeString = event.start.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+                        // Ambil waktu dari extendedProps (data dari server)
+                        let timeString = 'Sepanjang hari';
+                        if (event.extendedProps && event.extendedProps.start_time && event.extendedProps.end_time) {
+                            // Jika ada start_time dan end_time dari database
+                            timeString = `${event.extendedProps.start_time} - ${event.extendedProps.end_time}`;
+                        } else if (event.extendedProps && event.extendedProps.start_time) {
+                            // Jika hanya ada start_time
+                            timeString = `Mulai ${event.extendedProps.start_time}`;
                         }
 
                         li.innerHTML = `
-                            <div class="mt-1.5 flex-shrink-0 h-2 w-2 bg-[#C8963E] rounded-full"></div>
-                            <div>
-                                <p class="text-[#333333] font-semibold text-sm">${event.title}</p>
-                                <p class="text-xs text-[#6b7280] mt-0.5">${timeString}</p>
+                            <div class="flex items-center space-x-3 flex-1">
+                                <div class="flex-shrink-0 h-2 w-2 bg-[#C8963E] rounded-full"></div>
+                                <div>
+                                    <p class="text-[#333333] font-medium">${event.title}</p>
+                                    <p class="text-sm text-gray-700">${timeString}</p>
+                                </div>
                             </div>
+                            <button 
+                                onclick="deleteEvent(${event.id}, '${event.title}')" 
+                                class="flex-shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Hapus kegiatan"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
                         `;
                         modalEventList.appendChild(li);
                     });
@@ -297,6 +331,83 @@
                 }
                 modal.classList.remove('hidden');
             };
+
+            // Fungsi untuk menghapus event dengan AJAX
+            window.deleteEvent = function(eventId, eventTitle) {
+                if (confirm(`Apakah Anda yakin ingin menghapus kegiatan "${eventTitle}"?`)) {
+                    // Tampilkan loading state
+                    const deleteButtons = document.querySelectorAll(`button[onclick*="deleteEvent(${eventId}"]`);
+                    deleteButtons.forEach(btn => {
+                        btn.disabled = true;
+                        btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                    });
+
+                    // Kirim DELETE request via AJAX
+                    fetch(`/events/${eventId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Hapus event dari FullCalendar
+                            const fcEvent = calendar.getEventById(eventId);
+                            if (fcEvent) {
+                                fcEvent.remove();
+                            }
+                            
+                            // Refresh event dots
+                            renderEventDots();
+                            
+                            // Tutup modal
+                            closeModal();
+                            
+                            // Tampilkan notifikasi sukses
+                            showNotification('Kegiatan berhasil dihapus!', 'success');
+                        } else {
+                            showNotification('Gagal menghapus kegiatan.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Terjadi kesalahan saat menghapus kegiatan.', 'error');
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        deleteButtons.forEach(btn => {
+                            btn.disabled = false;
+                            btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                        });
+                    });
+                }
+            };
+
+            // Fungsi untuk menampilkan notifikasi
+            function showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 ${
+                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                }`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateY(0)';
+                }, 10);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(-20px)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
 
             if (calendarEl) {
                 calendar = new FullCalendar.Calendar(calendarEl, {
@@ -308,16 +419,96 @@
                     },
                     height: 'auto',
                     events: '{{ route('events.index') }}',
-                    dateClick: function(info) { showDateDetails(info.date); },
+                    
+                    // Sembunyikan event default
+                    eventContent: function() {
+                        return { html: '' }; // Return empty untuk menyembunyikan event
+                    },
+                    
+                    dateClick: function(info) { 
+                        showDateDetails(info.date, info.dateStr); 
+                    },
+                    
                     eventClick: function(info) { 
                         info.jsEvent.preventDefault(); 
-                        showDateDetails(info.event.start); 
+                        const startDateStr = info.event.startStr.split('T')[0];
+                        showDateDetails(info.event.start, startDateStr); 
                     },
-                    eventDidMount: function(info) {
-                        info.el.style.backgroundColor = '#C8963E';
-                        info.el.style.borderColor = '#C8963E';
+                    
+                    // Render custom dots setelah events dimuat
+                    eventsSet: function() {
+                        renderEventDots();
+                    },
+                    
+                    datesSet: function() {
+                        renderEventDots();
                     }
                 });
+                
+                // Debounce timer untuk mencegah render berulang
+                let renderTimeout = null;
+                
+                // Fungsi untuk render dots di setiap tanggal
+                function renderEventDots() {
+                    // Clear timeout sebelumnya
+                    if (renderTimeout) {
+                        clearTimeout(renderTimeout);
+                    }
+                    
+                    // Delay render sedikit untuk menghindari multiple calls
+                    renderTimeout = setTimeout(() => {
+                        // Hapus SEMUA dots yang sudah ada
+                        document.querySelectorAll('.custom-event-dot').forEach(el => el.remove());
+                        
+                        // Loop semua cell tanggal
+                        document.querySelectorAll('.fc-daygrid-day').forEach(dayEl => {
+                            const dateStr = dayEl.getAttribute('data-date');
+                            if (!dateStr) return;
+                            
+                            // Cek apakah sudah ada indicator di cell ini
+                            if (dayEl.querySelector('.custom-event-dot')) return;
+                            
+                            const eventsOnDay = calendar.getEvents().filter(event => isEventOnDate(event, dateStr));
+                            
+                            if (eventsOnDay.length > 0) {
+                                // Buat container untuk garis + badge
+                                const lineContainer = document.createElement('div');
+                                lineContainer.className = 'custom-event-dot absolute bottom-1 left-0 right-0 flex items-center justify-center gap-1';
+                                lineContainer.style.cssText = 'cursor: pointer; height: 12px;'; // Fixed height untuk alignment konsisten
+                                
+                                // Buat garis horizontal
+                                const line = document.createElement('div');
+                                line.className = 'w-6 h-0.5 bg-[#C8963E] rounded-full flex-shrink-0';
+                                
+                                // Buat badge count jika lebih dari 1
+                                if (eventsOnDay.length > 1) {
+                                    const badge = document.createElement('span');
+                                    badge.className = 'text-[10px] font-bold text-[#C8963E] leading-none';
+                                    badge.textContent = `${eventsOnDay.length}`;
+                                    lineContainer.appendChild(line);
+                                    lineContainer.appendChild(badge);
+                                } else {
+                                    lineContainer.appendChild(line);
+                                }
+                                
+                                // Tambahkan ke cell
+                                const dayFrame = dayEl.querySelector('.fc-daygrid-day-frame');
+                                if (dayFrame) {
+                                    dayFrame.style.position = 'relative';
+                                    dayFrame.appendChild(lineContainer);
+                                }
+                                
+                                // Klik handler untuk garis
+                                lineContainer.addEventListener('click', function(e) {
+                                    e.stopPropagation();
+                                    const date = new Date(dateStr + 'T00:00:00');
+                                    showDateDetails(date, dateStr);
+                                });
+                            }
+                        });
+                    }, 100); // Delay 100ms
+                }
+                
                 calendar.render();
             }
         });

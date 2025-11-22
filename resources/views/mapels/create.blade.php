@@ -24,6 +24,20 @@
                            class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                     @error('nama_mapel') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
+
+                <label for="guru_id" class="block text-sm font-medium leading-6 text-gray-900 mt-4">Guru Utama (Opsional)</label>
+                <div class="mt-2">
+                    <select name="guru_id" id="guru_id"
+                            class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
+                        <option value="">-- Pilih Guru --</option>
+                        @foreach($gurus as $guru)
+                            <option value="{{ $guru->id }}" {{ old('guru_id') == $guru->id ? 'selected' : '' }}>
+                                {{ $guru->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('guru_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
             </div>
         </div>
 

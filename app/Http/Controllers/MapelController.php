@@ -16,17 +16,20 @@ class MapelController extends Controller
 
     public function create()
     {
-        return view('mapels.create');
+        $gurus = Guru::all();
+        return view('mapels.create', compact('gurus'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama_mapel' => 'required|string'
+            'nama_mapel' => 'required|string|max:255',
+            'guru_id' => 'nullable|exists:gurus,id',
         ]);
 
         Mapel::create([
             'nama_mapel' => $request->input('nama_mapel'),
+            'guru_id' => $request->input('guru_id'),
         ]);
 
         return redirect()->route('mapels.index')->with('success', 'Mata pelajaran berhasil ditambahkan.');
@@ -56,16 +59,13 @@ class MapelController extends Controller
             'guru_id' => $request->input('guru_id'), // Update guru utama
         ]);
 
-        // 2. 🚨 SINKRONISASI RELASI MANY-TO-MANY
-        // Jika ada guru_id yang dipilih di dropdown, sinkronkan ke tabel pivot.
-        if ($request->has('guru_id') && $request->input('guru_id') != '') {
-            // sync() akan menghapus semua relasi lama dan menambahkan yang baru.
-            // Ini memastikan guru utama juga terdaftar sebagai pengajar.
-            $mapel->gurus()->sync([$request->input('guru_id')]);
-        } else {
-            // Jika tidak ada guru yang dipilih, hapus semua relasi.
-            $mapel->gurus()->detach();
-        }
+        // 2. SINKRONISASI RELASI
+        // Jika ada guru_id yang dipilih, kita tidak perlu melakukan sync/detach karena
+        // relasi didefinisikan sebagai hasMany (Guru milik Mapel) atau belongsTo (Mapel milik Guru).
+        // Update 'guru_id' pada tabel mapels sudah dilakukan di atas.
+        
+        // Jika ingin mengupdate mapel_id pada tabel gurus (Guru mengajar Mapel ini),
+        // itu sebaiknya dilakukan di menu Manajemen Guru.
 
         return redirect()->route('mapels.index')->with('success', 'Mata pelajaran berhasil diperbarui.');
     }

@@ -16,25 +16,30 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $events = Event::all();
+        // Jika request via AJAX (FullCalendar) atau memiliki parameter 'start' (standar FullCalendar)
+        if ($request->ajax() || $request->has(['start', 'end'])) {
+            $events = Event::all();
 
-        $formattedEvents = $events->map(function ($event) {
-            
-            // FullCalendar end date bersifat eksklusif (tidak termasuk).
-            $endDate = $event->end ? \Carbon\Carbon::parse($event->end)->addDay()->format('Y-m-d') : null;
+            $formattedEvents = $events->map(function ($event) {
+                return [
+                    'id'    => $event->id,
+                    'title' => $event->title,
+                    'start' => $event->start_date->format('Y-m-d'),
+                    'end'   => $event->end_date ? $event->end_date->format('Y-m-d') : null,
+                    'allDay' => true, // Force all-day untuk konsistensi tampilan kalender
+                    'extendedProps' => [
+                        'start_time' => $event->start_time ? $event->start_time->format('H:i') : null,
+                        'end_time' => $event->end_time ? $event->end_time->format('H:i') : null,
+                    ],
+                ];
+            });
 
-            return [
-                'id'    => $event->id,
-                'title' => $event->title,
-                'start' => $event->start,
-                'end'   => $endDate,
-                'allDay' => true,
-                'backgroundColor' => '#10B981', // Hijau
-                'borderColor' => '#059669',     // Hijau gelap
-            ];
-        });
+            return response()->json($formattedEvents);
+        }
 
-        return response()->json($formattedEvents);
+        // Jika bukan AJAX -> kembalikan view management list
+        $events = Event::orderBy('start_date', 'desc')->get();
+        return view('events.index', compact('events'));
     }
 
     /**
@@ -53,18 +58,22 @@ class EventController extends Controller
         // Validasi input
         $request->validate([
             'title' => 'required|string|max:255',
-            'start' => 'required|date',
-            'end'   => 'nullable|date|after_or_equal:start',
+            'start_date' => 'required|date',
+            'end_date'   => 'nullable|date|after_or_equal:start_date',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time'   => 'nullable|date_format:H:i|after:start_time',
         ]);
 
         // Simpan ke database
         Event::create([
             'title' => $request->input('title'),
-            'start' => $request->input('start'),
-            'end'   => $request->input('end'),
+            'start_date' => $request->input('start_date'),
+            'end_date'   => $request->input('end_date'),
+            'start_time' => $request->input('start_time'),
+            'end_time'   => $request->input('end_time'),
         ]);
 
-        return redirect()->route('home')->with('success', 'Event berhasil ditambahkan!');
+        return redirect()->route('events.index')->with('success', 'Event berhasil ditambahkan!');
     }
 
     /**
@@ -84,29 +93,42 @@ class EventController extends Controller
         // Validasi input
         $request->validate([
             'title' => 'required|string|max:255',
-            'start' => 'required|date',
-            'end'   => 'nullable|date|after_or_equal:start',
+            'start_date' => 'required|date',
+            'end_date'   => 'nullable|date|after_or_equal:start_date',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time'   => 'nullable|date_format:H:i|after:start_time',
         ]);
 
         $event = Event::findOrFail($id);
 
         $event->update([
             'title' => $request->input('title'),
-            'start' => $request->input('start'),
-            'end'   => $request->input('end'),
+            'start_date' => $request->input('start_date'),
+            'end_date'   => $request->input('end_date'),
+            'start_time' => $request->input('start_time'),
+            'end_time'   => $request->input('end_time'),
         ]);
 
-        return redirect()->route('home')->with('success', 'Event berhasil diupdate!');
+        return redirect()->route('events.index')->with('success', 'Event berhasil diupdate!');
     }
 
     /**
      * Menghapus event dari database
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $event = Event::findOrFail($id);
         $event->delete();
 
+        // Jika request via AJAX, return JSON
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Event berhasil dihapus!'
+            ]);
+        }
+
+        // Jika bukan AJAX, redirect seperti biasa
         return redirect()->route('home')->with('success', 'Event berhasil dihapus!');
     }
     

@@ -20,15 +20,21 @@ class Event extends Model
      */
     protected $fillable = [
         'title',
-        'start',
-        'end',
+        'start_date',
+        'end_date',
+        'start_time',
+        'end_time',
     ];
 
     /**
-     * Jika kolom tanggal ingin di-cast otomatis menjadi objek Carbon
+     * The attributes that should be cast.
+     *
+     * @var array
      */
-    protected $dates = [
-        'start',
-        'end',
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
     ];
 }

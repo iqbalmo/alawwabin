@@ -1,16 +1,17 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Event | SITU Al-Awwabin')
+@section('title', 'Edit Event | SITU Al-Awwabin')
 
 @section('content')
 <div class="max-w-2xl mx-auto">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-[#2C5F2D]">Tambah Event Baru</h1>
-        <p class="mt-1 text-sm text-gray-600">Jadwalkan kegiatan atau acara sekolah baru.</p>
+        <h1 class="text-2xl font-bold text-[#2C5F2D]">Edit Event</h1>
+        <p class="mt-1 text-sm text-gray-600">Perbarui informasi event atau kegiatan sekolah.</p>
     </div>
 
-    <form action="{{ route('events.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('events.update', $event->id) }}" method="POST" class="space-y-6">
         @csrf
+        @method('PUT')
 
         <div class="bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
             <div class="bg-[#F0E6D2] px-6 py-4 border-b border-gray-100">
@@ -22,7 +23,7 @@
                 <div>
                     <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Judul Event <span class="text-red-600">*</span></label>
                     <div class="mt-2">
-                        <input type="text" name="title" id="title" value="{{ old('title') }}" placeholder="Contoh: Rapat Guru, Libur Nasional" required
+                        <input type="text" name="title" id="title" value="{{ old('title', $event->title) }}" placeholder="Contoh: Rapat Guru, Libur Nasional" required
                                class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                         @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
@@ -33,7 +34,7 @@
                     <div>
                         <label for="start_date" class="block text-sm font-medium leading-6 text-gray-900">Tanggal Mulai <span class="text-red-600">*</span></label>
                         <div class="mt-2">
-                            <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}" required
+                            <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $event->start_date->format('Y-m-d')) }}" required
                                    class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                             @error('start_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         </div>
@@ -43,7 +44,7 @@
                     <div>
                         <label for="end_date" class="block text-sm font-medium leading-6 text-gray-900">Tanggal Selesai (Opsional)</label>
                         <div class="mt-2">
-                            <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}"
+                            <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $event->end_date ? $event->end_date->format('Y-m-d') : '') }}"
                                    class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                             @error('end_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         </div>
@@ -57,7 +58,7 @@
                     <div>
                         <label for="start_time" class="block text-sm font-medium leading-6 text-gray-900">Jam Mulai (Opsional)</label>
                         <div class="mt-2">
-                            <input type="time" name="start_time" id="start_time" value="{{ old('start_time') }}"
+                            <input type="time" name="start_time" id="start_time" value="{{ old('start_time', $event->start_time ? $event->start_time->format('H:i') : '') }}"
                                    class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                             @error('start_time') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         </div>
@@ -67,7 +68,7 @@
                     <div>
                         <label for="end_time" class="block text-sm font-medium leading-6 text-gray-900">Jam Selesai (Opsional)</label>
                         <div class="mt-2">
-                            <input type="time" name="end_time" id="end_time" value="{{ old('end_time') }}"
+                            <input type="time" name="end_time" id="end_time" value="{{ old('end_time', $event->end_time ? $event->end_time->format('H:i') : '') }}"
                                    class="block w-full rounded-lg border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#C8963E] sm:text-sm sm:leading-6">
                             @error('end_time') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         </div>
@@ -83,8 +84,8 @@
                 Batal
             </a>
             <button type="submit"
-                    class="rounded-lg bg-[#C8963E] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#b58937] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600 transition-all">
-                Simpan Event
+                    class="rounded-lg bg-[#2C5F2D] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#214621] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all">
+                Update Event
             </button>
         </div>
     </form>
